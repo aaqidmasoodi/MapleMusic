@@ -80,7 +80,11 @@ class AudioEngine {
 
     // New track loaded
     if (state.currentTrack && state.currentTrack.id !== this.loadedTrackId) {
-      await this.loadTrack(state.currentTrack)
+      try {
+        await this.loadTrack(state.currentTrack)
+      } catch (err) {
+        console.error('[audio] loadTrack error:', err)
+      }
     }
 
     // Play / pause

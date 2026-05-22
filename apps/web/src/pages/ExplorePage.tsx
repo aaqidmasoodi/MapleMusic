@@ -41,6 +41,7 @@ interface ExploreVideo {
   title: string | null
   artist: string | null
   thumbnail_path: string | null
+  audio_path: string | null
   status: string
   created_at: string
 }
@@ -58,7 +59,7 @@ export function ExplorePage() {
     async function load() {
       const { data } = await supabase
         .from('videos')
-        .select('id, youtube_id, title, artist, thumbnail_path, status, created_at')
+        .select('id, youtube_id, title, artist, thumbnail_path, audio_path, status, created_at')
         .order('created_at', { ascending: false })
         .limit(30)
       if (data) setRecentVideos(data)
@@ -78,7 +79,7 @@ export function ExplorePage() {
         : youtubeThumbnailUrl(v.youtube_id),
       durationSeconds: 0,
       status: v.status as Track['status'],
-      audioPath: null,
+      audioPath: v.audio_path,
     }
     setTrack(track)
   }
