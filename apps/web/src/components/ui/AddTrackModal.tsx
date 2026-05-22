@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AlertCircle, CheckCircle2, Link2, Plus, X } from 'lucide-react'
+import { AlertCircle, Check, CheckCircle2, Link2, Plus, X } from 'lucide-react'
 
 import { parseYoutubeId } from '../../lib/youtube'
 import { useAddTrack, type AddTrackResult } from '../../hooks/useAddTrack'
@@ -27,7 +27,9 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
   const playlistInputRef = useRef<HTMLInputElement>(null)
   const { submit, status, error, result, reset } = useAddTrack()
   const { playlists, createPlaylist } = usePlaylists()
+  const currentTrack = usePlayerStore((s) => s.currentTrack)
   const setTrack = usePlayerStore((s) => s.setTrack)
+  const updateCurrentTrack = usePlayerStore((s) => s.updateCurrentTrack)
 
   const youtubeId = parseYoutubeId(url)
   const isValid = youtubeId !== null
@@ -70,6 +72,17 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
 
   useEffect(() => {
     if (status !== 'success' || !result) return
+
+    if (currentTrack?.id === result.videoId) {
+      // Already playing — metadata update from oembed arriving late.
+      updateCurrentTrack(result.videoId, {
+        title: result.title,
+        artist: result.artist,
+        thumbnailUrl: result.thumbnailUrl,
+      })
+      return
+    }
+
     const track: Track = {
       id: result.videoId,
       youtubeId: result.youtubeId,
@@ -90,7 +103,7 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
     return () => {
       clearTimeout(t)
     }
-  }, [status, result, selectedPlaylistId, setTrack])
+  }, [status, result, selectedPlaylistId, setTrack, currentTrack, updateCurrentTrack])
 
   const handleCreatePlaylist = useCallback(async () => {
     const name = newPlaylistName.trim() || 'New Playlist'
@@ -112,7 +125,7 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
       const text = await navigator.clipboard.readText()
       setUrl(text)
     } catch {
-      // Clipboard access denied — silently ignore
+      /* clipboard access denied */
     }
   }, [])
 
@@ -138,25 +151,18 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
   )
 
   return (
-    <>
-      {/* Backdrop */}
+    <div className={`${styles.backdrop} ${isOpen ? styles.open : ''}`} onClick={onClose}>
       <div
-        className={`${styles.backdrop} ${isOpen ? styles.open : ''}`}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Sheet */}
-      <div
-        className={`${styles.sheet} ${isOpen ? styles.open : ''}`}
+        className={`${styles.modal} ${isOpen ? styles.open : ''}`}
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
         role="dialog"
         aria-modal="true"
         aria-label="Add a track"
       >
-        <div className={styles.handle} />
-
         <div className={styles.header}>
-          <div>
+          <div className={styles.titleGroup}>
             <h2 className={styles.title}>Add a track</h2>
             <p className={styles.subtitle}>Paste a YouTube link to stream it</p>
           </div>
@@ -176,61 +182,63 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
           </div>
         ) : (
           <div className={styles.body}>
-            {/* URL input */}
-            <div
-              className={`${styles.inputRow} ${url && !isValid ? styles.inputError : ''} ${isValid ? styles.inputValid : ''}`}
-            >
-              <Link2 size={15} strokeWidth={1.75} className={styles.inputIcon} />
-              <input
-                ref={inputRef}
-                type="url"
-                value={url}
-                onChange={(e) => {
-                  setUrl(e.target.value)
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder="https://youtube.com/watch?v=..."
-                className={styles.input}
-                spellCheck={false}
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-              />
-              <button
-                className={styles.pasteBtn}
-                onClick={() => {
-                  void handlePaste()
-                }}
-                type="button"
+            <div>
+              <label className={styles.sectionLabel}>YouTube link</label>
+              <div
+                className={`${styles.inputRow} ${url && !isValid ? styles.inputError : ''} ${isValid ? styles.inputValid : ''}`}
               >
-                Paste
-              </button>
+                <Link2 size={15} strokeWidth={1.75} className={styles.inputIcon} />
+                <input
+                  ref={inputRef}
+                  type="url"
+                  value={url}
+                  onChange={(e) => {
+                    setUrl(e.target.value)
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder="https://youtube.com/watch?v=..."
+                  className={styles.input}
+                  spellCheck={false}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                />
+                <button
+                  className={styles.pasteBtn}
+                  onClick={() => {
+                    void handlePaste()
+                  }}
+                  type="button"
+                >
+                  Paste
+                </button>
+              </div>
+
+              {url.length > 0 && (
+                <div
+                  className={`${styles.hint} ${isValid ? styles.hintValid : styles.hintInvalid}`}
+                >
+                  {isValid ? (
+                    <>
+                      <CheckCircle2 size={11} strokeWidth={2.5} />
+                      <span>
+                        ID: <code className={styles.ytId}>{youtubeId}</code>
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle size={11} strokeWidth={2.5} />
+                      <span>Not a valid YouTube URL</span>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Validation hint */}
-            {url.length > 0 && (
-              <div className={`${styles.hint} ${isValid ? styles.hintValid : styles.hintInvalid}`}>
-                {isValid ? (
-                  <>
-                    <CheckCircle2 size={11} strokeWidth={2.5} />
-                    <span>
-                      ID: <code className={styles.ytId}>{youtubeId}</code>
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <AlertCircle size={11} strokeWidth={2.5} />
-                    <span>Not a valid YouTube URL</span>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* Playlist selector */}
-            <div className={styles.playlistSelector}>
-              <label className={styles.playlistLabel}>Add to playlist</label>
+            <div className={styles.playlistSection}>
+              <label className={styles.sectionLabel}>Add to playlist</label>
               {isCreatingPlaylist ? (
-                <div className={styles.newPlaylistInput}>
+                <div className={styles.newPlaylistRow}>
                   <input
                     ref={playlistInputRef}
                     type="text"
@@ -249,43 +257,45 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
                       void handleCreatePlaylist()
                     }}
                     type="button"
+                    aria-label="Create playlist"
                   >
-                    <Plus size={14} strokeWidth={2} />
+                    <Plus size={14} strokeWidth={2.5} />
                   </button>
                 </div>
               ) : (
-                <div className={styles.playlistRow}>
-                  <select
-                    value={selectedPlaylistId ?? ''}
-                    onChange={(e) => {
-                      setSelectedPlaylistId(e.target.value)
-                    }}
-                    className={styles.playlistSelect}
-                  >
-                    <option value="" disabled>
-                      Select a playlist
-                    </option>
-                    {playlists.map((pl) => (
-                      <option key={pl.id} value={pl.id}>
-                        {pl.name}
-                      </option>
-                    ))}
-                  </select>
+                <div className={styles.playlistList}>
+                  {playlists.map((pl) => (
+                    <button
+                      key={pl.id}
+                      className={`${styles.playlistItem} ${selectedPlaylistId === pl.id ? styles.playlistItemActive : ''}`}
+                      onClick={() => {
+                        setSelectedPlaylistId(pl.id)
+                      }}
+                      type="button"
+                    >
+                      <span className={styles.playlistName}>{pl.name}</span>
+                      <Check
+                        size={14}
+                        strokeWidth={2.5}
+                        className={`${styles.playlistCheck} ${selectedPlaylistId === pl.id ? styles.playlistCheckVisible : ''}`}
+                      />
+                    </button>
+                  ))}
+                  <div className={styles.playlistDivider} />
                   <button
                     className={styles.newPlaylistBtn}
                     onClick={() => {
                       setIsCreatingPlaylist(true)
                     }}
                     type="button"
-                    aria-label="Create new playlist"
                   >
                     <Plus size={14} strokeWidth={2} />
+                    <span>New Playlist</span>
                   </button>
                 </div>
               )}
             </div>
 
-            {/* API error */}
             {status === 'error' && error && (
               <div className={styles.errorBanner}>
                 <AlertCircle size={13} strokeWidth={1.75} />
@@ -305,6 +315,6 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }

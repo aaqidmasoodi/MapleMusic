@@ -137,9 +137,11 @@ class AudioEngine {
 
   private preWarmNext(): void {
     const { queue, queueIndex } = usePlayerStore.getState()
-    const next = queue[queueIndex + 1]
-    if (next.status !== 'ready') {
-      void preWarmWorker(next.youtubeId)
+    if (queueIndex + 1 < queue.length) {
+      const next = queue[queueIndex + 1]
+      if (next.status !== 'ready') {
+        void preWarmWorker(next.youtubeId)
+      }
     }
   }
 

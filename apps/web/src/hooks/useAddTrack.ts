@@ -54,28 +54,47 @@ export function useAddTrack() {
     setError(null)
 
     try {
-      const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`
-      const [resp, oembed] = await Promise.all([
-        supabase.functions.invoke<SubmitTrackResult>('submit-track', { body: { url } }),
-        fetch(oembedUrl)
-          .then((r) => (r.ok ? (r.json() as Promise<OembedData>) : null))
-          .catch(() => null),
-      ])
+      const resp = await supabase.functions.invoke<SubmitTrackResult>('submit-track', {
+        body: { url },
+      })
 
       if (resp.error) throw new Error(String(resp.error))
       const data = resp.data
       if (!data) throw new Error('No response from server')
 
+      // Set result immediately — playback starts as soon as this state flips.
       setResult({
         videoId: data.videoId,
         youtubeId,
-        title: oembed?.title ?? youtubeId,
-        artist: oembed?.author_name ?? '',
-        thumbnailUrl: oembed?.thumbnail_url ?? youtubeThumbnailUrl(youtubeId),
+        title: youtubeId,
+        artist: '',
+        thumbnailUrl: youtubeThumbnailUrl(youtubeId),
       })
       setStatus('success')
-      // Fire-and-forget: kick off URL pre-resolution so first play is fast.
-      void proactiveWarm(youtubeId)
+
+      // Fetch oembed for real metadata + pre-warm the stream — both fire-and-forget.
+      void (async () => {
+        try {
+          const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`
+          const oembedResp = await fetch(oembedUrl)
+          if (oembedResp.ok) {
+            const oembed = (await oembedResp.json()) as OembedData
+            setResult((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    title: oembed.title ?? prev.title,
+                    artist: oembed.author_name ?? prev.artist,
+                    thumbnailUrl: oembed.thumbnail_url ?? prev.thumbnailUrl,
+                  }
+                : prev,
+            )
+          }
+        } catch {
+          /* oembed failure is non-fatal */
+        }
+        void proactiveWarm(youtubeId)
+      })()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong')
       setStatus('error')
