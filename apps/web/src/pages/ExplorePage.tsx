@@ -1,17 +1,32 @@
-import { Search, TrendingUp, Music2 } from 'lucide-react'
+import {
+  AudioLines,
+  BookMarked,
+  Coffee,
+  Compass,
+  Cpu,
+  Flame,
+  Guitar,
+  Heart,
+  Mic2,
+  Music2,
+  Search,
+  Star,
+  TrendingUp,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import styles from './ExplorePage.module.css'
 
-const categories = [
-  { label: 'Hip-Hop', color: '#7c3aed' },
-  { label: 'Electronic', color: '#0891b2' },
-  { label: 'Rock', color: '#dc2626' },
-  { label: 'Jazz', color: '#d97706' },
-  { label: 'Classical', color: '#059669' },
-  { label: 'Pop', color: '#db2777' },
-  { label: 'R&B', color: '#7c3aed' },
-  { label: 'Lo-Fi', color: '#2563eb' },
-  { label: 'Metal', color: '#374151' },
-  { label: 'Indie', color: '#b45309' },
+const categories: { label: string; color: string; Icon: LucideIcon }[] = [
+  { label: 'Hip-Hop', color: '#7c3aed', Icon: Mic2 },
+  { label: 'Electronic', color: '#0891b2', Icon: Cpu },
+  { label: 'Rock', color: '#dc2626', Icon: Guitar },
+  { label: 'Jazz', color: '#d97706', Icon: AudioLines },
+  { label: 'Classical', color: '#059669', Icon: BookMarked },
+  { label: 'Pop', color: '#db2777', Icon: Star },
+  { label: 'R&B', color: '#9333ea', Icon: Heart },
+  { label: 'Lo-Fi', color: '#2563eb', Icon: Coffee },
+  { label: 'Metal', color: '#64748b', Icon: Flame },
+  { label: 'Indie', color: '#b45309', Icon: Compass },
 ]
 
 export function ExplorePage() {
@@ -34,13 +49,16 @@ export function ExplorePage() {
           <h2 className={styles.sectionTitle}>Browse by genre</h2>
         </div>
         <div className={styles.grid}>
-          {categories.map((cat) => (
+          {categories.map(({ label, color, Icon }) => (
             <button
-              key={cat.label}
+              key={label}
               className={styles.catCard}
-              style={{ '--cat-color': cat.color } as React.CSSProperties}
+              style={{ '--cat-color': color } as React.CSSProperties}
             >
-              <span>{cat.label}</span>
+              <div className={styles.catIcon}>
+                <Icon size={20} strokeWidth={1.75} />
+              </div>
+              <span className={styles.catLabel}>{label}</span>
             </button>
           ))}
         </div>
