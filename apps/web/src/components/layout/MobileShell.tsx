@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router'
 import { BottomNav } from './BottomNav'
 import { MiniPlayer } from './MiniPlayer'
+import { FullPlayer } from '../player/FullPlayer'
 import styles from './MobileShell.module.css'
 
 export function MobileShell() {
@@ -11,6 +12,7 @@ export function MobileShell() {
       </main>
       <MiniPlayer />
       <BottomNav />
+      <FullPlayer />
     </div>
   )
 }

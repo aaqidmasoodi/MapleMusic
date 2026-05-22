@@ -10,13 +10,20 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-3);
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-2);
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   position: relative;
+  cursor: pointer;
+  transition: background var(--t-base);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bar:hover {
+  background: var(--color-surface-3);
 }
 
 .thumb {
@@ -30,6 +37,14 @@
   justify-content: center;
   color: var(--color-text-3);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .meta {
@@ -43,15 +58,22 @@
 .title {
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  color: var(--color-text-2);
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.title.empty {
+  color: var(--color-text-2);
+}
+
 .subtitle {
   font-size: var(--text-xs);
   color: var(--color-text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .playBtn {
@@ -70,11 +92,36 @@
     transform var(--t-fast);
 }
 
-.playBtn:active {
+.playBtn:hover {
   background: var(--color-accent);
-  transform: scale(0.92);
 }
 
+.playBtn:active {
+  transform: scale(0.9);
+}
+
+.skipBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-3);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color var(--t-base), transform var(--t-fast);
+}
+
+.skipBtn:hover {
+  color: var(--color-text-2);
+}
+
+.skipBtn:active {
+  transform: scale(0.88);
+}
+
+/* Progress line at very bottom of the card */
 .progressBar {
   position: absolute;
   bottom: 0;
@@ -86,7 +133,7 @@
 
 .progressFill {
   height: 100%;
-  width: 0%;
   background: var(--color-accent);
   border-radius: var(--radius-full);
+  transition: width 0.5s linear;
 }

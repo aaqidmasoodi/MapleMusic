@@ -4,19 +4,75 @@
   left: 0;
   right: 0;
   height: var(--player-bar-height);
-  background: rgba(14, 14, 14, 0.92);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  background: rgba(10, 10, 10, 0.94);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
   border-top: 1px solid var(--color-border-subtle);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Top seek bar ──────────────────────────────────────────── */
+.seekBar {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 3px;
+  border-radius: 0;
+  background: linear-gradient(
+    to right,
+    var(--color-accent) var(--progress, 0%),
+    var(--color-border-subtle) var(--progress, 0%)
+  );
+  cursor: pointer;
+  outline: none;
+  z-index: 1;
+  opacity: 0.8;
+  transition: opacity var(--t-base), height var(--t-base);
+}
+
+.seekBar:hover {
+  opacity: 1;
+  height: 4px;
+}
+
+.seekBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0;
+  height: 0;
+  transition: width var(--t-fast), height var(--t-fast);
+}
+
+.seekBar:hover::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--color-accent);
+  border-radius: var(--radius-full);
+}
+
+.seekBar::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  border: none;
+}
+
+/* ─── Inner layout ──────────────────────────────────────────── */
+.inner {
+  flex: 1;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: 0 var(--sp-6);
+  padding: 0 var(--sp-5);
   gap: var(--sp-6);
-  z-index: 200;
 }
 
-/* ── Track info ───────────────────────────── */
+/* ─── Track info ────────────────────────────────────────────── */
 .track {
   display: flex;
   align-items: center;
@@ -28,13 +84,21 @@
   width: 44px;
   height: 44px;
   border-radius: var(--radius-md);
-  background: var(--color-surface-3);
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-text-3);
+  overflow: hidden;
+}
+
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .trackMeta {
@@ -47,7 +111,7 @@
 .trackTitle {
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  color: var(--color-text-2);
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -56,23 +120,12 @@
 .trackArtist {
   font-size: var(--text-xs);
   color: var(--color-text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ── Controls ─────────────────────────────── */
-.controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sp-2);
-}
-
-.controlBtns {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-}
-
-.ctrlBtn {
+.likeBtn {
   width: 28px;
   height: 28px;
   display: flex;
@@ -81,13 +134,65 @@
   color: var(--color-text-3);
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition:
-    color var(--t-base),
-    background var(--t-base);
+  flex-shrink: 0;
+  transition: color var(--t-base), transform var(--t-fast);
+}
+
+.likeBtn:hover {
+  color: var(--color-accent);
+  transform: scale(1.2);
+}
+
+/* ─── Center controls ───────────────────────────────────────── */
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.controlBtns {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.ctrlBtn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--color-text-3);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  position: relative;
+  transition: color var(--t-base), transform var(--t-fast);
 }
 
 .ctrlBtn:hover {
   color: var(--color-text);
+}
+
+.ctrlBtn:active {
+  transform: scale(0.88);
+}
+
+.ctrlBtn.active {
+  color: var(--color-accent);
+}
+
+.activeDot {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  background: var(--color-accent);
+  border-radius: var(--radius-full);
 }
 
 .playBtn {
@@ -100,87 +205,157 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition:
-    background var(--t-base),
-    transform var(--t-fast);
+  transition: background var(--t-base), transform var(--t-fast);
   flex-shrink: 0;
 }
 
 .playBtn:hover {
   background: var(--color-accent);
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
+.playBtn:active {
+  transform: scale(0.94);
+}
+
+/* ─── Progress row ──────────────────────────────────────────── */
 .progress {
-  width: 240px;
   display: flex;
   align-items: center;
   gap: var(--sp-2);
+  width: 280px;
 }
 
 .progressTime {
   font-size: 10px;
   color: var(--color-text-3);
-  width: 28px;
+  width: 26px;
   flex-shrink: 0;
+  user-select: none;
 }
 
 .progressTime:last-child {
   text-align: right;
 }
 
-.progressTrack {
+.progressRange {
+  -webkit-appearance: none;
+  appearance: none;
   flex: 1;
   height: 3px;
-  background: var(--color-surface-3);
   border-radius: var(--radius-full);
+  background: linear-gradient(
+    to right,
+    var(--color-text-2) var(--progress, 0%),
+    var(--color-surface-3) var(--progress, 0%)
+  );
   cursor: pointer;
-  position: relative;
-}
-
-.progressFill {
-  height: 100%;
-  width: 0%;
-  background: var(--color-text-2);
-  border-radius: var(--radius-full);
+  outline: none;
   transition: background var(--t-base);
 }
 
-.progressTrack:hover .progressFill {
-  background: var(--color-accent);
+.progressRange:hover {
+  background: linear-gradient(
+    to right,
+    var(--color-accent) var(--progress, 0%),
+    var(--color-surface-3) var(--progress, 0%)
+  );
 }
 
-/* ── Extra controls ────────────────────────── */
+.progressRange::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0;
+  height: 0;
+  background: var(--color-text);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: width var(--t-fast), height var(--t-fast);
+}
+
+.progressRange:hover::-webkit-slider-thumb {
+  width: 10px;
+  height: 10px;
+}
+
+.progressRange::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  border: none;
+}
+
+/* ─── Extra / volume ────────────────────────────────────────── */
 .extra {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--sp-3);
 }
 
 .volumeWrap {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  color: var(--color-text-3);
 }
 
-.volumeTrack {
-  width: 80px;
-  height: 3px;
-  background: var(--color-surface-3);
+.volBtn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-3);
   border-radius: var(--radius-full);
   cursor: pointer;
-  position: relative;
+  flex-shrink: 0;
+  transition: color var(--t-base);
 }
 
-.volumeFill {
-  height: 100%;
-  width: 65%;
+.volBtn:hover {
+  color: var(--color-text-2);
+}
+
+.volumeRange {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 88px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    to right,
+    var(--color-text-3) var(--progress, 0%),
+    var(--color-surface-3) var(--progress, 0%)
+  );
+  cursor: pointer;
+  outline: none;
+  transition: background var(--t-base);
+}
+
+.volumeRange:hover {
+  background: linear-gradient(
+    to right,
+    var(--color-text-2) var(--progress, 0%),
+    var(--color-surface-3) var(--progress, 0%)
+  );
+}
+
+.volumeRange::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0;
+  height: 0;
   background: var(--color-text-2);
   border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: width var(--t-fast), height var(--t-fast);
 }
 
-.volumeTrack:hover .volumeFill {
-  background: var(--color-accent);
+.volumeRange:hover::-webkit-slider-thumb {
+  width: 10px;
+  height: 10px;
+}
+
+.volumeRange::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  border: none;
 }
