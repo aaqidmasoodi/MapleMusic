@@ -1,0 +1,22 @@
+# Pings the worker's /healthz every ~12 min so Render's free tier doesn't spin
+# it down (cold starts are ~50s and would break instant playback).
+# Set the repo variable WORKER_URL (Settings → Secrets and variables → Actions
+# → Variables) to your Render URL, e.g. https://maplemusic-worker.onrender.com
+name: keep-worker-warm
+
+on:
+  schedule:
+    - cron: '*/12 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /healthz
+        run: |
+          if [ -z "${{ vars.WORKER_URL }}" ]; then
+            echo "WORKER_URL repo variable not set — skipping."
+            exit 0
+          fi
+          curl -fsS --max-time 60 "${{ vars.WORKER_URL }}/healthz" && echo " ✓ warm"

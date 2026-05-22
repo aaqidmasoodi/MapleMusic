@@ -289,6 +289,25 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: var(--sp-3);
+}
+
+.expandBtn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color var(--t-base), background var(--t-base);
+}
+
+.expandBtn:hover {
+  color: var(--color-text-2);
+  background: var(--color-surface-2);
 }
 
 .volumeWrap {

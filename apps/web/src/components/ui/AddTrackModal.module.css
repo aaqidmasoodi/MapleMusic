@@ -208,6 +208,14 @@
   gap: var(--sp-3);
 }
 
+.successThumb {
+  width: 160px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  display: block;
+}
+
 .successIconWrap {
   color: var(--color-success);
 }

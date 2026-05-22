@@ -7,9 +7,11 @@
 .main {
   flex: 1;
   margin-left: var(--sidebar-width);
+  margin-right: var(--now-playing-width);
   display: flex;
   flex-direction: column;
   min-height: calc(100dvh - var(--player-bar-height));
+  min-width: 0;
 }
 
 .content {

@@ -13,6 +13,7 @@ import {
   VolumeX,
 } from 'lucide-react'
 import { usePlayerStore } from '../../stores/player.store'
+import { audioEngine } from '../../lib/audio-engine'
 import styles from './FullPlayer.module.css'
 
 function fmt(secs: number) {
@@ -98,7 +99,9 @@ export function FullPlayer() {
             step={0.001}
             value={progress}
             onChange={(e) => {
-              setProgress(parseFloat(e.target.value))
+              const v = parseFloat(e.target.value)
+              setProgress(v)
+              audioEngine.seek(v)
             }}
             className={styles.progressRange}
             style={{ '--progress': progressPct } as React.CSSProperties}

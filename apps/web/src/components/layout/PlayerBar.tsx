@@ -1,5 +1,6 @@
 import {
   Heart,
+  Maximize2,
   Music2,
   Pause,
   Play,
@@ -12,6 +13,7 @@ import {
   VolumeX,
 } from 'lucide-react'
 import { usePlayerStore } from '../../stores/player.store'
+import { audioEngine } from '../../lib/audio-engine'
 import styles from './PlayerBar.module.css'
 
 function fmt(secs: number) {
@@ -29,6 +31,7 @@ export function PlayerBar() {
     repeatMode,
     volume,
     isMuted,
+    setExpanded,
     togglePlay,
     skipNext,
     skipPrev,
@@ -54,7 +57,9 @@ export function PlayerBar() {
         step={0.001}
         value={progress}
         onChange={(e) => {
-          setProgress(parseFloat(e.target.value))
+          const v = parseFloat(e.target.value)
+          setProgress(v)
+          audioEngine.seek(v)
         }}
         className={styles.seekBar}
         style={{ '--progress': progressPct } as React.CSSProperties}
@@ -141,7 +146,9 @@ export function PlayerBar() {
               step={0.001}
               value={progress}
               onChange={(e) => {
-                setProgress(parseFloat(e.target.value))
+                const v = parseFloat(e.target.value)
+                setProgress(v)
+                audioEngine.seek(v)
               }}
               className={styles.progressRange}
               style={{ '--progress': progressPct } as React.CSSProperties}
@@ -151,8 +158,19 @@ export function PlayerBar() {
           </div>
         </div>
 
-        {/* Volume */}
+        {/* Volume + expand */}
         <div className={styles.extra}>
+          {currentTrack && (
+            <button
+              className={styles.expandBtn}
+              onClick={() => {
+                setExpanded(true)
+              }}
+              aria-label="Full screen player"
+            >
+              <Maximize2 size={13} strokeWidth={1.75} />
+            </button>
+          )}
           <div className={styles.volumeWrap}>
             <button className={styles.volBtn} onClick={toggleMute} aria-label="Toggle mute">
               {isMuted || volume === 0 ? (

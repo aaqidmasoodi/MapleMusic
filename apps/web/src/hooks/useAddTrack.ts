@@ -1,5 +1,25 @@
 import { useCallback, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { youtubeThumbnailUrl } from '../lib/youtube'
+
+const WORKER_URL = import.meta.env.VITE_WORKER_URL as string | undefined
+
+async function proactiveWarm(youtubeId: string): Promise<void> {
+  if (!WORKER_URL) return
+  try {
+    const { data } = await supabase.auth.getSession()
+    const token = data.session?.access_token
+    if (!token) return
+    await fetch(
+      `${WORKER_URL}/warm/${encodeURIComponent(youtubeId)}?token=${encodeURIComponent(token)}`,
+      {
+        method: 'POST',
+      },
+    )
+  } catch {
+    // Fire-and-forget — don't block the UI
+  }
+}
 
 type AddTrackStatus = 'idle' | 'loading' | 'success' | 'error'
 
@@ -10,24 +30,52 @@ interface SubmitTrackResult {
   jobId?: string
 }
 
+interface OembedData {
+  title?: string
+  author_name?: string
+  thumbnail_url?: string
+}
+
+export interface AddTrackResult {
+  videoId: string
+  youtubeId: string
+  title: string
+  artist: string
+  thumbnailUrl: string
+}
+
 export function useAddTrack() {
   const [status, setStatus] = useState<AddTrackStatus>('idle')
   const [error, setError] = useState<string | null>(null)
-  const [videoId, setVideoId] = useState<string | null>(null)
+  const [result, setResult] = useState<AddTrackResult | null>(null)
 
-  const submit = useCallback(async (url: string) => {
+  const submit = useCallback(async (url: string, youtubeId: string) => {
     setStatus('loading')
     setError(null)
 
     try {
-      const resp = await supabase.functions.invoke<SubmitTrackResult>('submit-track', {
-        body: { url },
-      })
+      const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`
+      const [resp, oembed] = await Promise.all([
+        supabase.functions.invoke<SubmitTrackResult>('submit-track', { body: { url } }),
+        fetch(oembedUrl)
+          .then((r) => (r.ok ? (r.json() as Promise<OembedData>) : null))
+          .catch(() => null),
+      ])
+
       if (resp.error) throw new Error(String(resp.error))
       const data = resp.data
       if (!data) throw new Error('No response from server')
-      setVideoId(data.videoId)
+
+      setResult({
+        videoId: data.videoId,
+        youtubeId,
+        title: oembed?.title ?? youtubeId,
+        artist: oembed?.author_name ?? '',
+        thumbnailUrl: oembed?.thumbnail_url ?? youtubeThumbnailUrl(youtubeId),
+      })
       setStatus('success')
+      // Fire-and-forget: kick off URL pre-resolution so first play is fast.
+      void proactiveWarm(youtubeId)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong')
       setStatus('error')
@@ -37,8 +85,8 @@ export function useAddTrack() {
   const reset = useCallback(() => {
     setStatus('idle')
     setError(null)
-    setVideoId(null)
+    setResult(null)
   }, [])
 
-  return { submit, status, error, videoId, reset }
+  return { submit, status, error, result, reset }
 }
