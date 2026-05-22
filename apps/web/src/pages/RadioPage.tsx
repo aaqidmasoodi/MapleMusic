@@ -1,11 +1,38 @@
-import { Radio, Zap } from 'lucide-react'
+import { Radio, Zap, Waves, Flame, Moon, Coffee } from 'lucide-react'
 import styles from './RadioPage.module.css'
 
 const stations = [
-  { name: 'Chill Vibes', desc: 'Lo-fi beats to relax and focus', gradient: 'from-blue' },
-  { name: 'Energy Boost', desc: 'High-tempo tracks for your workout', gradient: 'from-red' },
-  { name: 'Deep Focus', desc: 'Ambient soundscapes for concentration', gradient: 'from-green' },
-  { name: 'Late Night', desc: 'Moody R&B and soul for the late hours', gradient: 'from-purple' },
+  { name: 'Chill Vibes', desc: 'Lo-fi beats to relax and focus', color: '#2563eb', Icon: Coffee },
+  {
+    name: 'Energy Boost',
+    desc: 'High-tempo tracks for your workout',
+    color: '#e8365d',
+    Icon: Flame,
+  },
+  {
+    name: 'Deep Focus',
+    desc: 'Ambient soundscapes for concentration',
+    color: '#059669',
+    Icon: Waves,
+  },
+  {
+    name: 'Late Night',
+    desc: 'Moody R&B and soul for the late hours',
+    color: '#7c3aed',
+    Icon: Moon,
+  },
+  {
+    name: 'New Releases',
+    desc: 'Fresh drops from across every genre',
+    color: '#d97706',
+    Icon: Zap,
+  },
+  {
+    name: 'Your Mix',
+    desc: 'Personalised picks based on your history',
+    color: '#0891b2',
+    Icon: Radio,
+  },
 ]
 
 export function RadioPage() {
@@ -13,28 +40,34 @@ export function RadioPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>Radio</h1>
-        <p className={styles.subtitle}>AI-generated stations based on your taste.</p>
+        <p className={styles.subtitle}>AI-curated stations tailored to your taste.</p>
       </div>
 
-      <section className={styles.section}>
-        <div className={styles.stationGrid}>
-          {stations.map((s) => (
-            <div key={s.name} className={`${styles.stationCard} ${styles[s.gradient]}`}>
-              <div className={styles.stationIcon}>
-                <Radio size={20} />
-              </div>
-              <div className={styles.stationInfo}>
-                <span className={styles.stationName}>{s.name}</span>
-                <span className={styles.stationDesc}>{s.desc}</span>
-              </div>
-              <div className={styles.comingSoon}>
-                <Zap size={11} />
-                Soon
-              </div>
+      <p className={styles.sectionTitle}>Available stations</p>
+      <div className={styles.grid}>
+        {stations.map(({ name, desc, color, Icon }) => (
+          <div
+            key={name}
+            className={styles.card}
+            style={{ '--card-color': color } as React.CSSProperties}
+          >
+            <div
+              className={styles.iconWrap}
+              style={{ '--card-color': color } as React.CSSProperties}
+            >
+              <Icon size={20} strokeWidth={1.75} />
             </div>
-          ))}
-        </div>
-      </section>
+            <div className={styles.info}>
+              <span className={styles.cardTitle}>{name}</span>
+              <span className={styles.cardDesc}>{desc}</span>
+            </div>
+            <div className={styles.badge}>
+              <Zap size={9} />
+              Soon
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

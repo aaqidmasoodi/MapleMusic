@@ -1,11 +1,18 @@
 .shell {
   display: flex;
   min-height: 100dvh;
+  padding-bottom: var(--player-bar-height);
 }
 
 .main {
   flex: 1;
   margin-left: var(--sidebar-width);
-  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--player-bar-height));
+}
+
+.content {
+  flex: 1;
   overflow-y: auto;
 }
