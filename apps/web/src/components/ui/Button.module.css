@@ -1,0 +1,105 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  transition:
+    background var(--t-fast),
+    opacity var(--t-fast),
+    transform var(--t-fast),
+    box-shadow var(--t-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* Sizes */
+.sm {
+  height: 34px;
+  padding: 0 var(--sp-4);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+}
+
+.md {
+  height: 44px;
+  padding: 0 var(--sp-6);
+}
+
+.lg {
+  height: 52px;
+  padding: 0 var(--sp-8);
+  font-size: var(--text-lg);
+  border-radius: var(--radius-xl);
+}
+
+/* Variants */
+.primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.primary:hover {
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-accent);
+}
+
+.secondary {
+  background: var(--color-surface-3);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.secondary:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--color-text-2);
+}
+
+.ghost:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.full {
+  width: 100%;
+}
+
+/* Loading */
+.loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
