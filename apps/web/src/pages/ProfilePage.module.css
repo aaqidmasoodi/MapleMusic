@@ -1,0 +1,197 @@
+.page {
+  padding: var(--sp-8) var(--sp-6) var(--sp-12);
+  max-width: 800px;
+}
+
+.header {
+  margin-bottom: var(--sp-8);
+}
+
+.title {
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+  line-height: 1.1;
+}
+
+/* ── Profile hero ──────────────────────────── */
+.hero {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  padding: var(--sp-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--sp-5);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-subtle);
+  border: 2px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.heroInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.heroName {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin-bottom: var(--sp-1);
+}
+
+.heroEmail {
+  font-size: var(--text-sm);
+  color: var(--color-text-3);
+  margin-bottom: var(--sp-3);
+}
+
+.heroMeta {
+  display: flex;
+  gap: var(--sp-4);
+}
+
+.heroMetaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heroMetaValue {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+}
+
+.heroMetaLabel {
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Stats cards ────────────────────────────── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-8);
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  transition: border-color var(--t-base);
+}
+
+.statCard:hover {
+  border-color: var(--color-border);
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.statIcon {
+  color: var(--color-text-3);
+}
+
+.statChange {
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+}
+
+.statValue {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+}
+
+.statLabel {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Actions ────────────────────────────────── */
+.actionsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.sectionTitle {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-2);
+}
+
+.actionsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-2);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    background var(--t-base),
+    color var(--t-base);
+}
+
+.actionRow:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.actionRow.danger {
+  color: var(--color-error);
+}
+
+.actionRow.danger:hover {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.actionLabel {
+  flex: 1;
+}
+
+.actionArrow {
+  color: var(--color-text-3);
+}
