@@ -180,7 +180,6 @@ async function handleFailure(job: JobRow, message: string): Promise<void> {
 
 function contentTypeFor(file: string): string {
   if (file.endsWith('.m3u8')) return 'application/x-mpegurl'
-  if (file.endsWith('.aac')) return 'audio/aac'
   if (file.endsWith('.ts')) return 'video/mp2t'
   return 'application/octet-stream'
 }

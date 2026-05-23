@@ -125,7 +125,14 @@ class AudioEngine {
         hls.loadSource(src.url)
         hls.attachMedia(audio)
         hls.on(Hls.Events.ERROR, (_e, data) => {
-          if (data.fatal) console.error('[audio] hls fatal', data.type, data.details)
+          if (!data.fatal) return
+          if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+            hls.startLoad()
+          } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+            hls.recoverMediaError()
+          } else {
+            console.error('[audio] hls fatal unrecoverable', data.type, data.details)
+          }
         })
       } else {
         // Safari plays HLS natively.
