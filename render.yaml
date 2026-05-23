@@ -26,7 +26,6 @@ services:
     name: maplemusic-web
     runtime: static
     plan: free
-    region: oregon
     buildCommand: cd apps/web && npm install && npm run build
     staticPublishPath: ./apps/web/dist
     autoDeploy: true
