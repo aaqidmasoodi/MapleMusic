@@ -12,9 +12,9 @@
   border-radius: var(--radius-sm);
   color: var(--color-text-3);
   cursor: pointer;
-  transition: color var(--t-fast), background var(--t-fast);
+  transition: color var(--t-fast), background var(--t-fast), opacity var(--t-fast);
   flex-shrink: 0;
-  opacity: 0;
+  opacity: 0.4;
 }
 
 .triggerVisible {
@@ -28,6 +28,7 @@
 }
 
 .trigger:hover {
+  opacity: 1;
   color: var(--color-text);
   background: var(--color-surface-2);
 }
