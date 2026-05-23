@@ -158,7 +158,7 @@ export async function transcodeToHls(
     '-hls_playlist_type',
     'vod',
     '-hls_segment_filename',
-    `${outDir}/seg_%03d.aac`,
+    `${outDir}/seg_%03d.ts`,
     `${outDir}/playlist.m3u8`,
   ]
 
