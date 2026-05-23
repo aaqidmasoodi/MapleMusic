@@ -1,4 +1,4 @@
-import { TriangleAlert } from 'lucide-react'
+import { Heart, TriangleAlert } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { youtubeThumbnailUrl } from '../../lib/youtube'
 import type { VideoRow } from '../../hooks/useLibrary'
@@ -96,6 +96,18 @@ export function TrackRow({
         ) : isReady && row.duration_seconds ? (
           <span className={styles.trackDuration}>{fmt(row.duration_seconds)}</span>
         ) : null}
+
+        <button
+          className={`${styles.likeBtn} ${isLiked ? styles.likeBtnActive : ''}`}
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleLike(row.id)
+          }}
+          aria-label={isLiked ? 'Unlike' : 'Like'}
+          type="button"
+        >
+          <Heart size={13} strokeWidth={1.75} fill={isLiked ? 'currentColor' : 'none'} />
+        </button>
 
         <TrackMenu
           row={row}

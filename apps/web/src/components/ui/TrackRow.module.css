@@ -124,9 +124,48 @@
   border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
+/* ─── Like button ──────────────────────────────────────────── */
+.likeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-1);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-3);
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity var(--t-fast), color var(--t-fast), background var(--t-fast);
+  flex-shrink: 0;
+}
+
+.likeBtn.likeBtnActive {
+  color: var(--color-accent);
+  opacity: 1;
+}
+
+.trackRow:hover .likeBtn,
+.trackRow:focus-within .likeBtn {
+  opacity: 1;
+}
+
+.likeBtn:hover {
+  color: var(--color-accent);
+  background: var(--color-accent-subtle);
+}
+
+@media (max-width: 767px) {
+  .likeBtn {
+    opacity: 1;
+  }
+
+  .likeBtn.likeBtnActive {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 767px) {
   .trackRow {
-    grid-template-columns: 28px 44px 1fr 44px;
+    grid-template-columns: 28px 44px 1fr 72px;
   }
 
   .trackDuration {
