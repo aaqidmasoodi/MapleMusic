@@ -173,9 +173,10 @@ export function PlaylistPage() {
         if (userId) {
           void supabase
             .from('user_videos')
-            .update({ liked_at: null })
-            .eq('user_id', userId)
-            .eq('video_id', videoId)
+            .upsert(
+              { user_id: userId, video_id: videoId, liked_at: null },
+              { onConflict: 'user_id,video_id' },
+            )
         }
       } else {
         void removeFromPlaylist(id, videoId)
