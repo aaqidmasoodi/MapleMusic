@@ -51,7 +51,11 @@ export function useLibrary() {
     if (!userId) return
     setIsLoading(true)
 
-    const { data, error } = await supabase
+    const seen = new Set<string>()
+    const all: VideoRow[] = []
+
+    // 1) Tracks in the user's personal library (user_videos).
+    const { data: uvData, error } = await supabase
       .from('user_videos')
       .select(
         'added_at, liked_at, videos(id, youtube_id, title, ai_title, artist, duration_seconds, thumbnail_path, audio_path, status, created_at)',
@@ -60,10 +64,41 @@ export function useLibrary() {
       .order('added_at', { ascending: false })
 
     if (error) {
-      console.warn(
-        '[library] user_videos query failed, falling back to videos table:',
-        error.message,
-      )
+      console.warn('[library] user_videos query failed:', error.message)
+    } else {
+      for (const r of uvData) {
+        const v = r.videos as unknown as Omit<VideoRow, 'liked_at'> | null
+        if (!v) continue
+        seen.add(v.id)
+        all.push({ ...v, liked_at: (r.liked_at as string | null) ?? null })
+      }
+    }
+
+    // 2) Also pull tracks from every playlist the user owns.
+    //    This catches tracks that somehow only exist in playlists.
+    const { data: userPls } = await supabase.from('playlists').select('id').eq('user_id', userId)
+
+    const plIds = ((userPls ?? []) as { id: string }[]).map((p) => p.id)
+    if (plIds.length > 0) {
+      const { data: pvData } = await supabase
+        .from('playlist_videos')
+        .select(
+          'videos!inner(id, youtube_id, title, ai_title, artist, duration_seconds, thumbnail_path, audio_path, status, created_at)',
+        )
+        .in('playlist_id', plIds)
+
+      if (pvData) {
+        for (const r of pvData) {
+          const v = r.videos as unknown as Omit<VideoRow, 'liked_at'> | null
+          if (!v || seen.has(v.id)) continue
+          seen.add(v.id)
+          all.push({ ...v, liked_at: null })
+        }
+      }
+    }
+
+    // Fallback if nothing worked — query videos directly by added_by.
+    if (all.length === 0) {
       const { data: fallback } = await supabase
         .from('videos')
         .select(
@@ -72,24 +107,20 @@ export function useLibrary() {
         .eq('added_by', userId)
         .order('created_at', { ascending: false })
 
-      const rows = ((fallback ?? []) as Omit<VideoRow, 'liked_at'>[]).map((v) => ({
-        ...v,
-        liked_at: null,
-      }))
-      setTracks(rows)
-      writeCache(userId, rows)
-    } else {
-      const rows = data
-        .map((r) => {
-          const v = r.videos as unknown as Omit<VideoRow, 'liked_at'> | null
-          if (!v) return null
-          return { ...v, liked_at: (r.liked_at as string | null) ?? null }
-        })
-        .filter((v): v is VideoRow => v !== null)
-      setTracks(rows)
-      writeCache(userId, rows)
+      if (fallback) {
+        for (const v of fallback as Omit<VideoRow, 'liked_at'>[]) {
+          if (seen.has(v.id)) continue
+          seen.add(v.id)
+          all.push({ ...v, liked_at: null })
+        }
+      }
     }
 
+    // Sort by created_at descending (latest first).
+    all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+    setTracks(all)
+    writeCache(userId, all)
     setIsLoading(false)
   }, [userId])
 
