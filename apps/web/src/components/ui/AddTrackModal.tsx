@@ -27,9 +27,7 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
   const playlistInputRef = useRef<HTMLInputElement>(null)
   const { submit, status, error, result, reset } = useAddTrack()
   const { playlists, createPlaylist } = usePlaylists()
-  const currentTrack = usePlayerStore((s) => s.currentTrack)
   const setTrack = usePlayerStore((s) => s.setTrack)
-  const updateCurrentTrack = usePlayerStore((s) => s.updateCurrentTrack)
 
   const youtubeId = parseYoutubeId(url)
   const isValid = youtubeId !== null
@@ -73,9 +71,9 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
   useEffect(() => {
     if (status !== 'success' || !result) return
 
-    if (currentTrack?.id === result.videoId) {
+    if (usePlayerStore.getState().currentTrack?.id === result.videoId) {
       // Already playing — metadata update from oembed arriving late.
-      updateCurrentTrack(result.videoId, {
+      usePlayerStore.getState().updateCurrentTrack(result.videoId, {
         title: result.title,
         artist: result.artist,
         thumbnailUrl: result.thumbnailUrl,
@@ -103,7 +101,7 @@ export function AddTrackModal({ isOpen, onClose, onSuccess, defaultPlaylistId }:
     return () => {
       clearTimeout(t)
     }
-  }, [status, result, selectedPlaylistId, setTrack, currentTrack, updateCurrentTrack])
+  }, [status, result, selectedPlaylistId, setTrack])
 
   const handleCreatePlaylist = useCallback(async () => {
     const name = newPlaylistName.trim() || 'New Playlist'
