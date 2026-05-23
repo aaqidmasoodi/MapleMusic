@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { youtubeThumbnailUrl } from '../../lib/youtube'
 import type { VideoRow } from '../../hooks/useLibrary'
 import type { Playlist } from '../../hooks/usePlaylists'
+import { usePlayerStore } from '../../stores/player.store'
 import { TrackMenu } from './TrackMenu'
 import styles from './TrackRow.module.css'
 
@@ -20,6 +21,16 @@ interface TrackRowProps {
   onAddToPlaylist: (playlistId: string, videoId: string) => void
   onRemoveFromPlaylist?: (videoId: string) => void
   onDeleteFromLibrary?: (id: string) => void
+}
+
+function PlayingIndicator() {
+  return (
+    <span className={styles.waveform} aria-label="Now playing">
+      <span className={`${styles.waveBar} ${styles.waveBar1}`} />
+      <span className={`${styles.waveBar} ${styles.waveBar2}`} />
+      <span className={`${styles.waveBar} ${styles.waveBar3}`} />
+    </span>
+  )
 }
 
 function fmt(secs: number): string {
@@ -53,13 +64,16 @@ export function TrackRow({
   onRemoveFromPlaylist,
   onDeleteFromLibrary,
 }: TrackRowProps) {
+  const currentTrack = usePlayerStore((s) => s.currentTrack)
+  const isPlaying = usePlayerStore((s) => s.isPlaying)
   const isReady = row.status === 'ready'
   const isFailed = row.status === 'failed'
   const isPlayable = !isFailed
+  const isCurrentTrack = currentTrack?.id === row.id
 
   return (
     <div
-      className={`${styles.trackRow} ${isPlayable ? styles.trackPlayable : ''}`}
+      className={`${styles.trackRow} ${isPlayable ? styles.trackPlayable : ''} ${isCurrentTrack ? styles.trackRowActive : ''}`}
       role={isPlayable ? 'button' : undefined}
       tabIndex={isPlayable ? 0 : undefined}
       aria-label={isPlayable ? `Play ${displayTitle(row)}` : undefined}
@@ -70,7 +84,11 @@ export function TrackRow({
         if (isPlayable && (e.key === 'Enter' || e.key === ' ')) onPlay(row)
       }}
     >
-      <span className={styles.trackIndex}>{index + 1}</span>
+      {isCurrentTrack && isPlaying ? (
+        <PlayingIndicator />
+      ) : (
+        <span className={styles.trackIndex}>{index + 1}</span>
+      )}
 
       <div className={styles.trackThumb}>
         <img src={thumbnailUrl(row)} alt="" className={styles.trackThumbImg} loading="lazy" />
