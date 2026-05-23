@@ -195,9 +195,10 @@ export function useLibrary() {
       setTracks((prev) => prev.map((t) => (t.id === videoId ? { ...t, liked_at } : t)))
       await supabase
         .from('user_videos')
-        .update({ liked_at })
-        .eq('user_id', userId)
-        .eq('video_id', videoId)
+        .upsert(
+          { user_id: userId, video_id: videoId, liked_at },
+          { onConflict: 'user_id,video_id' },
+        )
     },
     [userId, tracks],
   )
