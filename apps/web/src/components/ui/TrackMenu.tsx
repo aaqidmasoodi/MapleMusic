@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Heart, Library, MoreVertical, Trash2, X } from 'lucide-react'
+import { Heart, Library, ListMusic, MoreVertical, Trash2, X } from 'lucide-react'
 import type { Playlist } from '../../hooks/usePlaylists'
 import styles from './TrackMenu.module.css'
 
