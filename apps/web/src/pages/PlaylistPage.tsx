@@ -92,6 +92,23 @@ export function PlaylistPage() {
           return { ...v, liked_at: null as string | null, position: r.position as number }
         })
         .filter((v): v is VideoRow & { position: number } => v !== null)
+
+      // Merge liked_at from user_videos so the heart reflects actual state.
+      const userId = useAuthStore.getState().user?.id
+      if (userId && rows.length > 0) {
+        const { data: uvData } = await supabase
+          .from('user_videos')
+          .select('video_id, liked_at')
+          .eq('user_id', userId)
+          .in(
+            'video_id',
+            rows.map((r) => r.id),
+          )
+        if (uvData) {
+          const likeMap = new Map(uvData.map((u) => [u.video_id, u.liked_at]))
+          rows = rows.map((r) => ({ ...r, liked_at: (likeMap.get(r.id) as string | null) ?? null }))
+        }
+      }
     }
 
     setTracks(rows)
