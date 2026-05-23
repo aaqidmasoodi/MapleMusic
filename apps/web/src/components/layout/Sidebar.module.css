@@ -155,22 +155,59 @@
   flex-shrink: 0;
 }
 
-/* ── Library empty state ─────────────────── */
-.libraryEmpty {
-  margin: var(--sp-1) var(--sp-3);
-  padding: var(--sp-4);
-  background: var(--color-surface-2);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-lg);
+/* ── Playlist controls ───────────────────── */
+.sectionRow {
   display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-3);
+  margin-bottom: var(--sp-1);
 }
 
-.libraryEmptyText {
-  font-size: var(--text-xs);
+.newPlaylistBtn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-text-3);
-  line-height: 1.5;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color var(--t-base), background var(--t-base);
+}
+
+.newPlaylistBtn:hover {
+  color: var(--color-text-2);
+  background: var(--color-surface-3);
+}
+
+.playlistInput {
+  padding: 0 var(--sp-3) var(--sp-1);
+}
+
+.playlistNameInput {
+  width: 100%;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  font-family: var(--font);
+  outline: none;
+  transition: border-color var(--t-base);
+}
+
+.playlistNameInput:focus {
+  border-color: var(--color-accent);
+}
+
+.playlistName {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .libraryCreateBtn {
@@ -187,6 +224,7 @@
   cursor: pointer;
   transition: background var(--t-base);
   width: fit-content;
+  margin: var(--sp-1) var(--sp-3);
 }
 
 .libraryCreateBtn:hover {

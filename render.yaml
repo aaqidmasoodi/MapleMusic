@@ -1,0 +1,39 @@
+# Render Blueprint for MapleMusic.
+# Go to Render → New → Blueprint → select this repo → both services deploy at once.
+services:
+  # ── Worker: audio transcoding + streaming ──────────────────────
+  - type: web
+    name: maplemusic-worker
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./apps/worker/Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: PUBLIC_AUDIO
+        value: 'true'
+      - key: AUDIO_BITRATE
+        value: 128k
+
+  # ── Frontend: Vite SPA ─────────────────────────────────────────
+  - type: web
+    name: maplemusic-web
+    runtime: static
+    plan: free
+    region: oregon
+    buildCommand: cd apps/web && npm install && npm run build
+    staticPublishPath: ./apps/web/dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+      - key: VITE_WORKER_URL
+        sync: false

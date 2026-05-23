@@ -2,12 +2,19 @@ import { create } from 'zustand'
 
 export type RepeatMode = 'none' | 'all' | 'one'
 
+export type TrackStatus = 'pending' | 'processing' | 'ready' | 'failed'
+
 export interface Track {
   id: string
+  youtubeId: string
   title: string
   artist: string
   thumbnailUrl: string | null
   durationSeconds: number
+  /** When 'ready', stream cached HLS from the CDN; otherwise live-proxy via the worker. */
+  status: TrackStatus
+  /** HLS manifest path in the audio bucket, e.g. hls/{youtubeId}/playlist.m3u8 */
+  audioPath: string | null
 }
 
 interface PlayerState {
@@ -23,6 +30,13 @@ interface PlayerState {
   isExpanded: boolean
 
   setTrack: (track: Track, queue?: Track[]) => void
+  /** Patch metadata on the current track (and matching queue entry) when it arrives async. */
+  updateCurrentTrack: (
+    id: string,
+    fields: Partial<
+      Pick<Track, 'title' | 'artist' | 'thumbnailUrl' | 'durationSeconds' | 'status' | 'audioPath'>
+    >,
+  ) => void
   togglePlay: () => void
   skipNext: () => void
   skipPrev: () => void
@@ -112,5 +126,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
   setExpanded: (v) => {
     set({ isExpanded: v })
+  },
+
+  updateCurrentTrack: (id, fields) => {
+    set((s) => ({
+      currentTrack: s.currentTrack?.id === id ? { ...s.currentTrack, ...fields } : s.currentTrack,
+      queue: s.queue.map((t) => (t.id === id ? { ...t, ...fields } : t)),
+    }))
   },
 }))

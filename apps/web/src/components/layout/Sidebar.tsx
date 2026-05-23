@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router'
-import { Compass, Radio, Library, Music2, Plus, Search } from 'lucide-react'
+import { Compass, Heart, Radio, Library, Music2, Plus, Search, ListMusic } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
+import { usePlaylists } from '../../hooks/usePlaylists'
 import styles from './Sidebar.module.css'
 
 const discoverItems = [
@@ -12,6 +14,16 @@ export function Sidebar() {
   const user = useAuthStore((s) => s.user)
   const initial = user?.email?.charAt(0).toUpperCase() ?? 'U'
   const displayEmail = user?.email ?? ''
+  const { playlists, createPlaylist } = usePlaylists()
+  const [creating, setCreating] = useState(false)
+  const [newName, setNewName] = useState('')
+
+  const handleCreatePlaylist = async () => {
+    const name = newName.trim() || 'New Playlist'
+    setCreating(false)
+    setNewName('')
+    await createPlaylist(name)
+  }
 
   return (
     <aside className={styles.sidebar}>
@@ -56,16 +68,67 @@ export function Sidebar() {
             <Library className={styles.icon} strokeWidth={1.75} />
             Library
           </NavLink>
+        </div>
 
-          <div className={styles.libraryEmpty}>
-            <span className={styles.libraryEmptyText}>
-              Create playlists to organise your music.
-            </span>
-            <button className={styles.libraryCreateBtn}>
-              <Plus size={11} />
-              New playlist
+        <div className={styles.section}>
+          <div className={styles.sectionRow}>
+            <span className={styles.sectionLabel}>Playlists</span>
+            <button
+              className={styles.newPlaylistBtn}
+              onClick={() => {
+                setCreating(true)
+                setNewName('')
+              }}
+              aria-label="New playlist"
+            >
+              <Plus size={12} strokeWidth={2.5} />
             </button>
           </div>
+
+          {creating && (
+            <div className={styles.playlistInput}>
+              <input
+                autoFocus
+                className={styles.playlistNameInput}
+                placeholder="Playlist name"
+                value={newName}
+                onChange={(e) => {
+                  setNewName(e.target.value)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') void handleCreatePlaylist()
+                  if (e.key === 'Escape') {
+                    setCreating(false)
+                    setNewName('')
+                  }
+                }}
+                onBlur={() => {
+                  void handleCreatePlaylist()
+                }}
+              />
+            </div>
+          )}
+
+          {playlists.map((pl) => (
+            <NavLink
+              key={pl.id}
+              to={`/playlist/${pl.id}`}
+              className={({ isActive }) =>
+                [styles.item, isActive ? styles.active : ''].filter(Boolean).join(' ')
+              }
+            >
+              {pl.name === 'Favorites' ? (
+                <Heart
+                  className={`${styles.icon} ${styles.favIcon}`}
+                  strokeWidth={1.75}
+                  fill="currentColor"
+                />
+              ) : (
+                <ListMusic className={styles.icon} strokeWidth={1.75} />
+              )}
+              <span className={styles.playlistName}>{pl.name}</span>
+            </NavLink>
+          ))}
         </div>
       </nav>
 

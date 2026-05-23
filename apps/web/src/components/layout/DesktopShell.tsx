@@ -2,6 +2,8 @@ import { Outlet } from 'react-router'
 import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
 import { PlayerBar } from './PlayerBar'
+import { NowPlayingPanel } from './NowPlayingPanel'
+import { FullPlayer } from '../player/FullPlayer'
 import styles from './DesktopShell.module.css'
 
 export function DesktopShell() {
@@ -14,7 +16,9 @@ export function DesktopShell() {
           <Outlet />
         </main>
       </div>
+      <NowPlayingPanel />
       <PlayerBar />
+      <FullPlayer />
     </div>
   )
 }

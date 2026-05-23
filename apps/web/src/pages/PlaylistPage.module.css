@@ -13,8 +13,21 @@
 
 .headingGroup {
   display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.playlistIcon {
+  width: 72px;
+  height: 72px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  flex-shrink: 0;
 }
 
 .title {
@@ -28,37 +41,37 @@
 .subtitle {
   font-size: var(--text-sm);
   color: var(--color-text-3);
+  margin-top: var(--sp-1);
 }
 
-/* ─── View toggle ─────────────────────────────────────────────── */
-.viewToggle {
+.headerActions {
   display: flex;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 3px;
-  gap: 2px;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
 }
 
-.viewBtn {
-  padding: var(--sp-2) var(--sp-4);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
+.deletePlaylistBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-text-3);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: color var(--t-fast), background var(--t-fast);
+  transition: color var(--t-base), background var(--t-base);
 }
 
-.viewBtn:hover {
-  color: var(--color-text-2);
+.deletePlaylistBtn:hover {
+  color: var(--color-error);
+  background: rgba(239, 68, 68, 0.08);
 }
 
-.viewBtn.viewBtnActive {
-  color: var(--color-text);
-  background: var(--color-surface-2);
+.playlistIconFav {
+  color: var(--color-accent) !important;
+  background: var(--color-accent-subtle) !important;
+  border-color: rgba(232, 54, 93, 0.2) !important;
 }
 
 /* ─── Loading ────────────────────────────────────────────────── */
@@ -112,6 +125,12 @@
   color: var(--color-text-3);
   max-width: 320px;
   line-height: 1.7;
+}
+
+.notFound {
+  color: var(--color-text-3);
+  font-size: var(--text-sm);
+  padding: var(--sp-8);
 }
 
 /* ─── Track list ─────────────────────────────────────────────── */
@@ -184,7 +203,6 @@
   user-select: none;
 }
 
-/* ─── Thumbnail ──────────────────────────────────────────────── */
 .trackThumb {
   width: 44px;
   height: 44px;
@@ -212,7 +230,6 @@
   color: var(--color-text-2);
 }
 
-/* ─── Track meta ─────────────────────────────────────────────── */
 .trackMeta {
   display: flex;
   flex-direction: column;
@@ -237,71 +254,11 @@
   text-overflow: ellipsis;
 }
 
-/* ─── Right column ───────────────────────────────────────────── */
 .trackRight {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: var(--sp-2);
-}
-
-.likeBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--sp-1);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-3);
-  opacity: 0;
-  transition: opacity var(--t-fast), color var(--t-fast), background var(--t-fast);
-  flex-shrink: 0;
-}
-
-.likeBtn.likeBtnActive {
-  color: var(--color-accent);
-  opacity: 1;
-}
-
-.trackRow:hover .likeBtn,
-.trackRow:focus-within .likeBtn {
-  opacity: 1;
-}
-
-.likeBtn:hover {
-  color: var(--color-accent);
-  background: var(--color-accent-subtle);
-}
-
-.deleteBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--sp-1);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-3);
-  opacity: 0;
-  transition: opacity var(--t-fast), color var(--t-fast), background var(--t-fast);
-  flex-shrink: 0;
-}
-
-.trackRow:hover .deleteBtn,
-.trackRow:focus-within .deleteBtn {
-  opacity: 1;
-}
-
-.deleteBtn:hover {
-  color: var(--color-error);
-  background: rgba(239, 68, 68, 0.1);
-}
-
-@media (max-width: 767px) {
-  .deleteBtn {
-    opacity: 1;
-  }
-
-  .likeBtn.likeBtnActive {
-    opacity: 1;
-  }
 }
 
 .trackDuration {
@@ -310,75 +267,31 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ─── Status badges ──────────────────────────────────────────── */
-.statusBadge {
-  font-size: 10px;
-  font-weight: var(--weight-medium);
-  padding: 2px 7px;
-  border-radius: var(--radius-full);
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-.status_pending {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--color-warning);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-}
-
-.status_processing {
-  background: rgba(59, 130, 246, 0.1);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.25);
-}
-
-.status_failed {
-  background: rgba(239, 68, 68, 0.08);
-  color: var(--color-error);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-/* ─── FAB (mobile "add" shortcut) ───────────────────────────── */
-.fab {
-  display: none;
-  position: fixed;
-  bottom: calc(var(--bottom-nav-height) + var(--mini-player-height) + var(--safe-bottom) + var(--sp-4));
-  right: var(--sp-5);
-  width: 52px;
-  height: 52px;
-  background: var(--color-accent);
-  border-radius: var(--radius-full);
+.removeBtn {
+  display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text);
-  box-shadow: 0 4px 20px rgba(232, 54, 93, 0.45);
-  cursor: pointer;
-  transition: transform var(--t-fast), box-shadow var(--t-base);
-  z-index: 80;
+  padding: var(--sp-1);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-3);
+  opacity: 0;
+  transition: opacity var(--t-fast), color var(--t-fast), background var(--t-fast);
+  flex-shrink: 0;
 }
 
-.fab:hover {
-  transform: scale(1.06);
-  box-shadow: 0 8px 28px rgba(232, 54, 93, 0.55);
+.trackRow:hover .removeBtn,
+.trackRow:focus-within .removeBtn {
+  opacity: 1;
 }
 
-.fab:active {
-  transform: scale(0.94);
-}
-
-.fabPlus {
-  position: absolute;
-  top: 6px;
-  right: 6px;
+.removeBtn:hover {
+  color: var(--color-error);
+  background: rgba(239, 68, 68, 0.1);
 }
 
 @media (max-width: 767px) {
   .page {
     padding: var(--sp-6) var(--sp-4) var(--sp-12);
-  }
-
-  .fab {
-    display: flex;
   }
 
   .listHeader {
@@ -388,66 +301,8 @@
   .listDivider {
     display: none;
   }
-}
 
-/* ─── Playlist list ───────────────────────────────────────────── */
-.playlistList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
-}
-
-.playlistRow {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--radius-md);
-  transition: background var(--t-fast);
-}
-
-.playlistRow:hover {
-  background: var(--color-surface);
-}
-
-.playlistLink {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  text-decoration: none;
-  min-width: 0;
-}
-
-.playlistIcon {
-  width: 48px;
-  height: 48px;
-  background: var(--color-surface-2);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-3);
-  flex-shrink: 0;
-}
-
-.playlistMeta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.playlistName {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--color-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.playlistCount {
-  font-size: var(--text-xs);
-  color: var(--color-text-3);
+  .removeBtn {
+    opacity: 1;
+  }
 }

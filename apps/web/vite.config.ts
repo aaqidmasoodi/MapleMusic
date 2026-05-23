@@ -31,11 +31,20 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
+            urlPattern: /\/storage\/v1\/object\/(public|authenticated)\/audio\//i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'audio-cache',
-              expiration: { maxEntries: 50, maxAgeSeconds: 7 * 24 * 60 * 60 },
+              expiration: { maxEntries: 500, maxAgeSeconds: 30 * 24 * 60 * 60 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            urlPattern: /\/storage\/v1\/object\/public\/thumbnails\//i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'thumbnails',
+              expiration: { maxEntries: 200, maxAgeSeconds: 30 * 24 * 60 * 60 },
             },
           },
         ],

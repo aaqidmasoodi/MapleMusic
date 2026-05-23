@@ -1,0 +1,376 @@
+/* ─── Backdrop ───────────────────────────────────────────────── */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─── Modal ──────────────────────────────────────────────────── */
+.modal {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  width: min(100%, 440px);
+  max-height: min(85vh, 680px);
+  overflow-y: auto;
+  padding: var(--sp-6);
+  transform: scale(0.92) translateY(12px);
+  opacity: 0;
+  transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1), opacity 280ms ease;
+}
+
+.modal.open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* ─── Header ─────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
+}
+
+.titleGroup {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.025em;
+  color: var(--color-text);
+  line-height: 1.2;
+  margin-bottom: var(--sp-1);
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-3);
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--color-text-2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--t-base), color var(--t-base);
+}
+
+.closeBtn:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text);
+}
+
+/* ─── Body ───────────────────────────────────────────────────── */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+/* ─── Section label ──────────────────────────────────────────── */
+.sectionLabel {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-2);
+  display: block;
+}
+
+/* ─── Input row ──────────────────────────────────────────────── */
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--color-surface-2);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--t-base);
+}
+
+.inputRow:focus-within {
+  border-color: var(--color-text-3);
+}
+
+.inputRow.inputValid {
+  border-color: var(--color-success);
+}
+
+.inputRow.inputError {
+  border-color: var(--color-error);
+}
+
+.inputIcon {
+  color: var(--color-text-3);
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  font-family: var(--font);
+  min-width: 0;
+}
+
+.input::placeholder {
+  color: var(--color-text-3);
+}
+
+.pasteBtn {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-accent);
+  cursor: pointer;
+  padding: 2px var(--sp-2);
+  border-radius: var(--radius-sm);
+  transition: background var(--t-fast);
+  flex-shrink: 0;
+  white-space: nowrap;
+  background: none;
+  border: none;
+}
+
+.pasteBtn:hover {
+  background: var(--color-accent-subtle);
+}
+
+/* ─── Validation hint ────────────────────────────────────────── */
+.hint {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--text-xs);
+  margin-top: calc(var(--sp-4) * -1);
+}
+
+.hintValid {
+  color: var(--color-success);
+}
+
+.hintInvalid {
+  color: var(--color-error);
+}
+
+.ytId {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Playlist section ───────────────────────────────────────── */
+.playlistSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.playlistList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-1);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.playlistItem {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-3) var(--sp-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-text-2);
+  font-size: var(--text-sm);
+  font-family: var(--font);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--t-fast), color var(--t-base);
+}
+
+.playlistItem:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text);
+}
+
+.playlistItemActive {
+  background: var(--color-accent-subtle);
+  color: var(--color-text);
+}
+
+.playlistItemActive:hover {
+  background: var(--color-accent-subtle-hover);
+}
+
+.playlistName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlistCheck {
+  opacity: 0;
+  color: var(--color-accent);
+  transition: opacity var(--t-fast);
+  flex-shrink: 0;
+}
+
+.playlistCheckVisible {
+  opacity: 1;
+}
+
+.playlistDivider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--sp-1) var(--sp-2);
+}
+
+.newPlaylistBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-3) var(--sp-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  font-family: var(--font);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--t-fast);
+}
+
+.newPlaylistBtn:hover {
+  background: var(--color-accent-subtle);
+}
+
+/* ─── New playlist inline input ──────────────────────────────── */
+.newPlaylistRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--color-surface-2);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--t-base);
+}
+
+.newPlaylistRow:focus-within {
+  border-color: var(--color-accent);
+}
+
+.createPlaylistBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--color-accent);
+  border: none;
+  border-radius: var(--radius-full);
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+
+.createPlaylistBtn:hover {
+  background: var(--color-accent-hover);
+  transform: scale(1.05);
+}
+
+/* ─── Error banner ───────────────────────────────────────────── */
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-error);
+}
+
+/* ─── Success state ──────────────────────────────────────────── */
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--sp-8) var(--sp-4);
+  gap: var(--sp-3);
+}
+
+.successThumb {
+  width: 180px;
+  height: 101px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  display: block;
+  box-shadow: var(--shadow-md);
+}
+
+.successIconWrap {
+  color: var(--color-success);
+  margin-top: var(--sp-1);
+}
+
+.successTitle {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.successText {
+  font-size: var(--text-sm);
+  color: var(--color-text-3);
+  line-height: 1.6;
+  max-width: 280px;
+}

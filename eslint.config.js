@@ -36,6 +36,13 @@ export default tseslint.config(
     ...tseslint.configs.disableTypeChecked,
   },
   {
-    ignores: ['**/dist/**', '**/build/**', '**/node_modules/**', '**/.vite/**', '**/coverage/**'],
+    ignores: [
+      '**/dist/**',
+      '**/build/**',
+      '**/node_modules/**',
+      '**/.vite/**',
+      '**/coverage/**',
+      'supabase/**',
+    ],
   },
 )
