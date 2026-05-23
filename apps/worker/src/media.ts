@@ -10,14 +10,27 @@ export interface YoutubeMetadata {
   thumbnailUrl: string | null
 }
 
-// Common yt-dlp args: pull bestaudio, never expand playlists, quiet logs.
+// Shared yt-dlp args to bypass YouTube bot detection and be resilient.
+function ytDlpBaseArgs(): string[] {
+  return [
+    '--no-playlist',
+    '--no-warnings',
+    '--quiet',
+    '--geo-bypass',
+    '--retries',
+    '5',
+    '--extractor-retries',
+    '5',
+    '--extractor-args',
+    'youtube:player_client=android,web',
+  ]
+}
+
 function ytDlpAudioArgs(youtubeId: string): string[] {
   return [
     '-f',
     'bestaudio/best',
-    '--no-playlist',
-    '--no-warnings',
-    '--quiet',
+    ...ytDlpBaseArgs(),
     '-o',
     '-', // write the downloaded stream to stdout
     youtubeUrl(youtubeId),
@@ -120,8 +133,7 @@ export async function fetchMetadata(youtubeId: string): Promise<YoutubeMetadata>
   const { stdout } = await runToCompletion(config.ytDlpBin, [
     '--print',
     '%(title)s\n%(uploader)s\n%(duration)s',
-    '--no-playlist',
-    '--no-warnings',
+    ...ytDlpBaseArgs(),
     youtubeUrl(youtubeId),
   ])
   const [title, uploader, duration] = stdout.trim().split('\n')
