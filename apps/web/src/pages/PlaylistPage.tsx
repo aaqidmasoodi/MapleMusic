@@ -1,24 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router'
-import { Clock, Heart, Loader2, Music2, Plus, Trash2, TriangleAlert } from 'lucide-react'
+import { Clock, Heart, Loader2, Music2, Plus, Trash2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/auth.store'
 import { usePlayerStore } from '../stores/player.store'
 import { usePlaylists } from '../hooks/usePlaylists'
 import { useLibrary } from '../hooks/useLibrary'
 import { AddTrackModal } from '../components/ui/AddTrackModal'
+import { TrackRow } from '../components/ui/TrackRow'
 import { Button } from '../components/ui/Button'
 import type { AddTrackResult } from '../hooks/useAddTrack'
 import type { Track } from '../stores/player.store'
 import type { VideoRow } from '../hooks/useLibrary'
 import { youtubeThumbnailUrl } from '../lib/youtube'
 import styles from './PlaylistPage.module.css'
-
-function fmt(secs: number): string {
-  const m = Math.floor(secs / 60)
-  const s = Math.floor(secs % 60)
-  return `${String(m)}:${s.toString().padStart(2, '0')}`
-}
 
 function thumbnailUrl(row: VideoRow): string {
   if (row.thumbnail_path) {
@@ -60,13 +55,12 @@ export function PlaylistPage() {
   const loadTracks = useCallback(async () => {
     if (!id) return
 
-    // Find the playlist from the playlists array (should be loaded by now)
-    const playlist = playlists.find((p) => p.id === id)
-    const isFavorites = playlist?.name === 'Favorites'
+    const found = playlists.find((p) => p.id === id)
+    const favors = found?.name === 'Favorites'
 
     let rows: (VideoRow & { position: number })[] = []
 
-    if (isFavorites) {
+    if (favors) {
       const { data } = await supabase
         .from('user_videos')
         .select(
@@ -119,8 +113,8 @@ export function PlaylistPage() {
   const handleAddSuccess = useCallback(
     async (result: AddTrackResult) => {
       if (!id) return
-      const isFavorites = playlist?.name === 'Favorites'
-      const likedAt = isFavorites ? new Date().toISOString() : null
+      const favors = playlist?.name === 'Favorites'
+      const likedAt = favors ? new Date().toISOString() : null
 
       setTracks((prev) => [
         ...prev,
@@ -153,7 +147,7 @@ export function PlaylistPage() {
         liked_at: likedAt,
       })
 
-      if (isFavorites) {
+      if (favors) {
         const userId = useAuthStore.getState().user?.id
         if (userId) {
           await supabase
@@ -171,23 +165,48 @@ export function PlaylistPage() {
   )
 
   const handleRemove = useCallback(
-    async (videoId: string) => {
+    (videoId: string) => {
       if (!id) return
       setTracks((prev) => prev.filter((t) => t.id !== videoId))
       if (playlist?.name === 'Favorites') {
         const userId = useAuthStore.getState().user?.id
         if (userId) {
-          await supabase
+          void supabase
             .from('user_videos')
             .update({ liked_at: null })
             .eq('user_id', userId)
             .eq('video_id', videoId)
         }
       } else {
-        await removeFromPlaylist(id, videoId)
+        void removeFromPlaylist(id, videoId)
       }
     },
     [id, playlist?.name, removeFromPlaylist],
+  )
+
+  const handleToggleLike = useCallback(
+    (videoId: string) => {
+      const userId = useAuthStore.getState().user?.id
+      if (!userId) return
+      const row = tracks.find((t) => t.id === videoId)
+      const isLiked = row?.liked_at !== null
+      const likedAt = isLiked ? null : new Date().toISOString()
+      setTracks((prev) => prev.map((t) => (t.id === videoId ? { ...t, liked_at: likedAt } : t)))
+      void supabase
+        .from('user_videos')
+        .upsert(
+          { user_id: userId, video_id: videoId, liked_at: likedAt },
+          { onConflict: 'user_id,video_id' },
+        )
+    },
+    [tracks],
+  )
+
+  const handleAddToPlaylist = useCallback(
+    (playlistId: string, videoId: string) => {
+      void addToPlaylist(playlistId, videoId)
+    },
+    [addToPlaylist],
   )
 
   const handleDeletePlaylist = useCallback(async () => {
@@ -280,60 +299,21 @@ export function PlaylistPage() {
             </span>
           </div>
           <div className={styles.listDivider} />
-          {tracks.map((row, i) => {
-            const isFailed = row.status === 'failed'
-            const isReady = row.status === 'ready'
-            const isPlayable = !isFailed
-            return (
-              <div
-                key={row.id}
-                className={`${styles.trackRow} ${isPlayable ? styles.trackPlayable : ''}`}
-                role={isPlayable ? 'button' : undefined}
-                tabIndex={isPlayable ? 0 : undefined}
-                aria-label={isPlayable ? `Play ${displayTitle(row)}` : undefined}
-                onClick={() => {
-                  if (isPlayable) handlePlay(row)
-                }}
-                onKeyDown={(e) => {
-                  if (isPlayable && (e.key === 'Enter' || e.key === ' ')) handlePlay(row)
-                }}
-              >
-                <span className={styles.trackIndex}>{i + 1}</span>
-                <div className={styles.trackThumb}>
-                  <img
-                    src={thumbnailUrl(row)}
-                    alt=""
-                    className={styles.trackThumbImg}
-                    loading="lazy"
-                  />
-                  {isFailed && (
-                    <div className={styles.trackThumbOverlay}>
-                      <TriangleAlert size={14} strokeWidth={2} />
-                    </div>
-                  )}
-                </div>
-                <div className={styles.trackMeta}>
-                  <span className={styles.trackTitle}>{displayTitle(row)}</span>
-                  <span className={styles.trackArtist}>{row.artist ?? 'Unknown artist'}</span>
-                </div>
-                <div className={styles.trackRight}>
-                  {isReady && row.duration_seconds ? (
-                    <span className={styles.trackDuration}>{fmt(row.duration_seconds)}</span>
-                  ) : null}
-                  <button
-                    className={styles.removeBtn}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      void handleRemove(row.id)
-                    }}
-                    aria-label={`Remove ${displayTitle(row)} from playlist`}
-                  >
-                    <Trash2 size={13} strokeWidth={1.75} />
-                  </button>
-                </div>
-              </div>
-            )
-          })}
+          {tracks.map((row, i) => (
+            <TrackRow
+              key={row.id}
+              row={row}
+              index={i}
+              playlists={playlists}
+              playlistId={id}
+              showRemoveFromPlaylist
+              isLiked={row.liked_at !== null}
+              onPlay={handlePlay}
+              onToggleLike={handleToggleLike}
+              onAddToPlaylist={handleAddToPlaylist}
+              onRemoveFromPlaylist={handleRemove}
+            />
+          ))}
         </div>
       )}
 

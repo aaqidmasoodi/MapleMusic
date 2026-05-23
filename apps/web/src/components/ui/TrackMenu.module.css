@@ -1,0 +1,144 @@
+.anchor {
+  position: relative;
+  display: flex;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-3);
+  cursor: pointer;
+  transition: color var(--t-fast), background var(--t-fast);
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.triggerVisible {
+  opacity: 1;
+  color: var(--color-accent);
+}
+
+.trackRow:hover .trigger,
+.trackRow:focus-within .trigger {
+  opacity: 1;
+}
+
+.trigger:hover {
+  color: var(--color-text);
+  background: var(--color-surface-2);
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 100;
+  min-width: 200px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  padding: var(--sp-1);
+  animation: menuEnter 0.12s ease-out;
+  overflow: hidden;
+}
+
+@keyframes menuEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--t-fast);
+  font-family: var(--font);
+  white-space: nowrap;
+}
+
+.menuItem:hover {
+  background: var(--color-surface);
+}
+
+.menuItemIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--color-text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menuItemDanger {
+  color: var(--color-error);
+}
+
+.menuItemDanger .menuItemIcon {
+  color: var(--color-error);
+}
+
+.menuItemDanger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.menuDivider {
+  height: 1px;
+  background: var(--color-border-subtle);
+  margin: var(--sp-1) 0;
+}
+
+.backBtn {
+  composes: menuItem;
+  color: var(--color-text-3);
+  font-size: var(--text-xs);
+}
+
+.backBtn:hover {
+  color: var(--color-text);
+}
+
+.submenuTitle {
+  padding: var(--sp-2) var(--sp-3) var(--sp-1);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.playlistItem {
+  composes: menuItem;
+}
+
+.playlistItemCheck {
+  margin-left: auto;
+  color: var(--color-accent);
+}
+
+@media (max-width: 767px) {
+  .trigger {
+    opacity: 1;
+  }
+}
