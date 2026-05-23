@@ -29,6 +29,14 @@ interface PlayerState {
   progress: number
   isExpanded: boolean
 
+  /** A-B repeat markers (0-1 fraction or null). */
+  abRepeat: boolean
+  markerA: number | null
+  markerB: number | null
+
+  /** Timeline zoom level (1 = full track, 2 = 2x, 4 = 4x, etc.) */
+  timelineZoom: number
+
   setTrack: (track: Track, queue?: Track[]) => void
   /** Patch metadata on the current track (and matching queue entry) when it arrives async. */
   updateCurrentTrack: (
@@ -46,6 +54,18 @@ interface PlayerState {
   toggleMute: () => void
   setProgress: (p: number) => void
   setExpanded: (v: boolean) => void
+
+  /** Timeline zoom controls. */
+  zoomIn: () => void
+  zoomOut: () => void
+  resetZoom: () => void
+
+  /** A-B repeat actions. */
+  setMarkerA: (position?: number) => void
+  setMarkerB: (position?: number) => void
+  setAbRepeat: (enabled: boolean) => void
+  clearAbMarkers: () => void
+  cycleAbMarkers: () => void
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -59,6 +79,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   isMuted: false,
   progress: 0,
   isExpanded: false,
+  abRepeat: false,
+  markerA: null,
+  markerB: null,
+  timelineZoom: 1,
 
   setTrack: (track, queue) => {
     const q = queue ?? [track]
@@ -69,6 +93,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       queueIndex: idx < 0 ? 0 : idx,
       isPlaying: true,
       progress: 0,
+      markerA: null,
+      markerB: null,
+      abRepeat: false,
     })
   },
 
@@ -126,6 +153,53 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
   setExpanded: (v) => {
     set({ isExpanded: v })
+  },
+
+  zoomIn: () => {
+    set((s) => ({ timelineZoom: Math.min(16, s.timelineZoom * 2) }))
+  },
+
+  zoomOut: () => {
+    set((s) => ({ timelineZoom: Math.max(1, s.timelineZoom / 2) }))
+  },
+
+  resetZoom: () => {
+    set({ timelineZoom: 1 })
+  },
+
+  setMarkerA: (position) => {
+    if (position !== undefined) {
+      set({ markerA: Math.max(0, Math.min(1, position)) })
+    } else {
+      set((s) => ({ markerA: s.progress }))
+    }
+  },
+
+  setMarkerB: (position) => {
+    if (position !== undefined) {
+      set({ markerB: Math.max(0, Math.min(1, position)) })
+    } else {
+      set((s) => ({ markerB: s.progress }))
+    }
+  },
+
+  setAbRepeat: (enabled) => {
+    set({ abRepeat: enabled })
+  },
+
+  clearAbMarkers: () => {
+    set({ markerA: null, markerB: null, abRepeat: false })
+  },
+
+  cycleAbMarkers: () => {
+    const { markerA, markerB, abRepeat, progress } = get()
+    if (!markerA && !markerB && !abRepeat) {
+      set({ markerA: progress })
+    } else if (markerA !== null && !markerB && !abRepeat) {
+      set({ markerB: Math.max(markerA + 0.01, progress), abRepeat: true })
+    } else {
+      set({ markerA: null, markerB: null, abRepeat: false })
+    }
   },
 
   updateCurrentTrack: (id, fields) => {

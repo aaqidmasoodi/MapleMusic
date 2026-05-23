@@ -184,6 +184,22 @@
   flex-shrink: 0;
 }
 
+.zoomRow {
+  display: flex;
+  justify-content: flex-end;
+  height: 0;
+  position: relative;
+  top: -4px;
+}
+
+.progressBarContainer {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  display: flex;
+  align-items: center;
+}
+
 .progressRange {
   -webkit-appearance: none;
   appearance: none;

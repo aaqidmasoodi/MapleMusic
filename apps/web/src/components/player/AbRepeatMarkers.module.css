@@ -1,0 +1,75 @@
+/* Container overlays the range input. pointer-events: none so
+   clicks fall through to the input for seeking. */
+.container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Highlighted region between markers */
+.region {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  transform: translateY(-50%);
+  background: rgba(232, 54, 93, 0.2);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.regionActive {
+  background: rgba(232, 54, 93, 0.35);
+}
+
+/* Draggable marker handle — hit area is wider than visual bar */
+.marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: ew-resize;
+  pointer-events: auto;
+  touch-action: none;
+  z-index: 4;
+}
+
+/* Visual vertical bar */
+.bar {
+  width: 3px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--color-text-3);
+  transition: background var(--t-fast), height var(--t-fast);
+}
+
+.marker:hover .bar,
+.marker.active .bar {
+  background: var(--color-accent);
+  height: 22px;
+}
+
+/* Small dot at center for extra visual grab point */
+.dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-text-3);
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+
+.marker:hover .dot,
+.marker.active .dot {
+  opacity: 1;
+  background: var(--color-accent);
+}
