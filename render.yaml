@@ -25,7 +25,6 @@ services:
   - type: web
     name: maplemusic-web
     runtime: static
-    plan: free
     buildCommand: cd apps/web && npm install && npm run build
     staticPublishPath: ./apps/web/dist
     autoDeploy: true
