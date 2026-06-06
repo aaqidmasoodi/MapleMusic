@@ -12,7 +12,7 @@ interface TrackRowProps {
   index: number
   playlists: Playlist[]
   /** Current playlist ID when viewing a specific playlist */
-  playlistId?: string
+  playlistId: string | undefined
   showRemoveFromPlaylist?: boolean
   showDeleteFromLibrary?: boolean
   isLiked: boolean
@@ -128,7 +128,6 @@ export function TrackRow({
         </button>
 
         <TrackMenu
-          row={row}
           playlists={playlists}
           playlistId={playlistId}
           showRemoveFromPlaylist={showRemoveFromPlaylist}

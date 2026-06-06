@@ -36,7 +36,7 @@ function toTrack(row: VideoRow): Track {
 
 interface PlaylistRowProps {
   playlist: Playlist
-  onDelete: (id: string) => Promise<void>
+  onDelete: (id: string) => void
 }
 
 function PlaylistRow({ playlist, onDelete }: PlaylistRowProps) {
@@ -64,7 +64,7 @@ function PlaylistRow({ playlist, onDelete }: PlaylistRowProps) {
           className={styles.deleteBtn}
           onClick={(e) => {
             e.preventDefault()
-            void onDelete(playlist.id)
+            onDelete(playlist.id)
           }}
           aria-label={`Delete ${playlist.name}`}
         >
@@ -197,6 +197,7 @@ export function LibraryPage() {
               row={row}
               index={i}
               playlists={playlists}
+              playlistId={undefined}
               showDeleteFromLibrary
               isLiked={row.liked_at !== null}
               onPlay={handlePlay}
