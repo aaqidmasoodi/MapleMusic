@@ -6,16 +6,16 @@ import styles from './TrackMenu.module.css'
 interface TrackMenuProps {
   playlists: Playlist[]
   /** Current playlist ID when viewing a specific playlist */
-  playlistId?: string
+  playlistId: string | undefined
   /** Whether to show "Remove from this playlist" */
-  showRemoveFromPlaylist?: boolean
+  showRemoveFromPlaylist: boolean | undefined
   /** Whether to show "Delete from library" */
-  showDeleteFromLibrary?: boolean
+  showDeleteFromLibrary: boolean | undefined
   isLiked: boolean
   onToggleLike: () => void
   onAddToPlaylist: (playlistId: string) => void
-  onRemoveFromPlaylist?: () => void
-  onDeleteFromLibrary?: () => void
+  onRemoveFromPlaylist: (() => void) | undefined
+  onDeleteFromLibrary: (() => void) | undefined
 }
 
 export function TrackMenu({
