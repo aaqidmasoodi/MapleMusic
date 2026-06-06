@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import {
   ChevronDown,
   Heart,
@@ -14,6 +15,10 @@ import {
 } from 'lucide-react'
 import { usePlayerStore } from '../../stores/player.store'
 import { audioEngine } from '../../lib/audio-engine'
+import { ABRepeatButton } from './ABRepeatButton'
+import { AbRepeatMarkers } from './AbRepeatMarkers'
+import { ZoomControls } from './ZoomControls'
+import { getZoomWindow, absoluteToWindow } from '../../lib/zoom-utils'
 import styles from './FullPlayer.module.css'
 
 function fmt(secs: number) {
@@ -41,11 +46,20 @@ export function FullPlayer() {
     setVolume,
     toggleMute,
     setProgress,
+    markerA,
+    markerB,
+    timelineZoom,
   } = usePlayerStore()
+
+  const zoomWindow = useMemo(
+    () => getZoomWindow(timelineZoom, markerA, markerB, progress),
+    [timelineZoom, markerA, markerB, progress],
+  )
 
   const elapsed = currentTrack ? progress * currentTrack.durationSeconds : 0
   const remaining = currentTrack ? currentTrack.durationSeconds * (1 - progress) : 0
-  const progressPct = `${(progress * 100).toFixed(3)}%`
+  const visibleProgress = absoluteToWindow(progress, zoomWindow)
+  const progressPct = `${(visibleProgress * 100).toFixed(3)}%`
   const volumePct = `${((isMuted ? 0 : volume) * 100).toFixed(1)}%`
 
   return (
@@ -92,21 +106,27 @@ export function FullPlayer() {
 
         {/* Progress bar */}
         <div className={styles.progressWrap}>
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.001}
-            value={progress}
-            onChange={(e) => {
-              const v = parseFloat(e.target.value)
-              setProgress(v)
-              audioEngine.seek(v)
-            }}
-            className={styles.progressRange}
-            style={{ '--progress': progressPct } as React.CSSProperties}
-            aria-label="Playback progress"
-          />
+          <div className={styles.zoomRow}>
+            <ZoomControls />
+          </div>
+          <div className={styles.progressBarContainer}>
+            <input
+              type="range"
+              min={zoomWindow.start}
+              max={zoomWindow.end}
+              step={timelineZoom > 1 ? 0.00001 : 0.001}
+              value={progress}
+              onChange={(e) => {
+                const v = parseFloat(e.target.value)
+                setProgress(v)
+                audioEngine.seek(v)
+              }}
+              className={styles.progressRange}
+              style={{ '--progress': progressPct } as React.CSSProperties}
+              aria-label="Playback progress"
+            />
+            <AbRepeatMarkers zoomWindow={zoomWindow} />
+          </div>
           <div className={styles.progressTimes}>
             <span>{fmt(elapsed)}</span>
             <span>-{fmt(remaining)}</span>
@@ -158,6 +178,8 @@ export function FullPlayer() {
             )}
             {repeatMode !== 'none' && <span className={styles.activeDot} />}
           </button>
+
+          <ABRepeatButton />
         </div>
 
         {/* Volume */}

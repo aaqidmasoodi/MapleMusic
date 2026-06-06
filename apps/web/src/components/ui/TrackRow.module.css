@@ -1,0 +1,230 @@
+.trackRow {
+  display: grid;
+  grid-template-columns: 28px 44px 1fr 120px;
+  gap: var(--sp-3);
+  align-items: center;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-md);
+  cursor: default;
+  transition: background var(--t-base);
+  user-select: none;
+}
+
+.trackRow.trackPlayable {
+  cursor: pointer;
+}
+
+.trackRow.trackPlayable:hover {
+  background: var(--color-surface);
+}
+
+.trackRow.trackPlayable:hover .trackIndex {
+  opacity: 0;
+}
+
+.trackIndex {
+  font-size: var(--text-sm);
+  color: var(--color-text-3);
+  text-align: center;
+  transition: opacity var(--t-fast);
+  user-select: none;
+}
+
+.trackThumb {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface-3);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.trackThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.trackThumbOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-2);
+}
+
+.trackMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.trackTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackArtist {
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackRight {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.trackDuration {
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.statusBadge {
+  font-size: 10px;
+  font-weight: var(--weight-medium);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.statusFailed {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--color-error);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.statusPending {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--color-warning);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.statusProcessing {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+/* ─── Like button ──────────────────────────────────────────── */
+.likeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-1);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-3);
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity var(--t-fast), color var(--t-fast), background var(--t-fast);
+  flex-shrink: 0;
+}
+
+.likeBtn.likeBtnActive {
+  color: var(--color-accent);
+  opacity: 1;
+}
+
+.trackRow:hover .likeBtn,
+.trackRow:focus-within .likeBtn {
+  opacity: 1;
+}
+
+.likeBtn:hover {
+  color: var(--color-accent);
+  background: var(--color-accent-subtle);
+}
+
+/* ─── Active track highlighting ───────────────────────────── */
+.trackRowActive {
+  background: var(--color-accent-subtle) !important;
+}
+
+.trackRowActive .trackTitle {
+  color: var(--color-accent);
+}
+
+/* ─── Waveform playing indicator ──────────────────────────── */
+.waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 16px;
+  width: 28px;
+}
+
+.waveBar {
+  width: 3px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  animation: wave 0.7s ease-in-out infinite alternate;
+}
+
+.waveBar1 {
+  height: 8px;
+  animation-delay: 0s;
+}
+
+.waveBar2 {
+  height: 14px;
+  animation-delay: 0.15s;
+}
+
+.waveBar3 {
+  height: 6px;
+  animation-delay: 0.3s;
+}
+
+@keyframes wave {
+  from {
+    transform: scaleY(0.4);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.trackRow.trackPlayable:hover .waveform {
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  .trackRow {
+    grid-template-columns: 28px 44px 1fr 72px;
+  }
+
+  .trackDuration {
+    display: none;
+  }
+
+  .statusBadge {
+    display: none;
+  }
+
+  .likeBtn {
+    opacity: 1;
+  }
+
+  .likeBtn.likeBtnActive {
+    opacity: 1;
+  }
+}

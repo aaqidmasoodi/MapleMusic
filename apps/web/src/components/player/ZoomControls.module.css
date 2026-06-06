@@ -1,0 +1,41 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.btn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-3);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--t-base), background var(--t-base);
+  font-family: inherit;
+}
+
+.btn:hover:not(:disabled) {
+  color: var(--color-text);
+  background: var(--color-surface-2);
+}
+
+.btn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.label {
+  font-size: 9px;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-3);
+  min-width: 14px;
+  text-align: center;
+  letter-spacing: 0.02em;
+  user-select: none;
+}

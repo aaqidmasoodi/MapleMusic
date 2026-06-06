@@ -47,82 +47,85 @@ export function useLibrary() {
   const [isLoading, setIsLoading] = useState(true)
   const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const load = useCallback(async () => {
-    if (!userId) return
-    setIsLoading(true)
+  const load = useCallback(
+    async (background?: boolean) => {
+      if (!userId) return
+      if (!background) setIsLoading(true)
 
-    const seen = new Set<string>()
-    const all: VideoRow[] = []
+      const seen = new Set<string>()
+      const all: VideoRow[] = []
 
-    // 1) Tracks in the user's personal library (user_videos).
-    const { data: uvData, error } = await supabase
-      .from('user_videos')
-      .select(
-        'added_at, liked_at, videos(id, youtube_id, title, ai_title, artist, duration_seconds, thumbnail_path, audio_path, status, created_at)',
-      )
-      .is('hidden_at', null)
-      .order('added_at', { ascending: false })
-
-    if (error) {
-      console.warn('[library] user_videos query failed:', error.message)
-    } else {
-      for (const r of uvData) {
-        const v = r.videos as unknown as Omit<VideoRow, 'liked_at'> | null
-        if (!v) continue
-        seen.add(v.id)
-        all.push({ ...v, liked_at: (r.liked_at as string | null) ?? null })
-      }
-    }
-
-    // 2) Also pull tracks from every playlist the user owns.
-    //    This catches tracks that somehow only exist in playlists.
-    const { data: userPls } = await supabase.from('playlists').select('id').eq('user_id', userId)
-
-    const plIds = ((userPls ?? []) as { id: string }[]).map((p) => p.id)
-    if (plIds.length > 0) {
-      const { data: pvData } = await supabase
-        .from('playlist_videos')
+      // 1) Tracks in the user's personal library (user_videos).
+      const { data: uvData, error } = await supabase
+        .from('user_videos')
         .select(
-          'videos!inner(id, youtube_id, title, ai_title, artist, duration_seconds, thumbnail_path, audio_path, status, created_at)',
+          'added_at, liked_at, videos(id, youtube_id, title, ai_title, artist, duration_seconds, thumbnail_path, audio_path, status, created_at)',
         )
-        .in('playlist_id', plIds)
+        .is('hidden_at', null)
+        .order('added_at', { ascending: false })
 
-      if (pvData) {
-        for (const r of pvData) {
+      if (error) {
+        console.warn('[library] user_videos query failed:', error.message)
+      } else {
+        for (const r of uvData) {
           const v = r.videos as unknown as Omit<VideoRow, 'liked_at'> | null
-          if (!v || seen.has(v.id)) continue
+          if (!v) continue
           seen.add(v.id)
-          all.push({ ...v, liked_at: null })
+          all.push({ ...v, liked_at: (r.liked_at as string | null) ?? null })
         }
       }
-    }
 
-    // Fallback if nothing worked — query videos directly by added_by.
-    if (all.length === 0) {
-      const { data: fallback } = await supabase
-        .from('videos')
-        .select(
-          'id, youtube_id, title, ai_title, artist, duration_seconds, thumbnail_path, audio_path, status, created_at',
-        )
-        .eq('added_by', userId)
-        .order('created_at', { ascending: false })
+      // 2) Also pull tracks from every playlist the user owns.
+      //    This catches tracks that somehow only exist in playlists.
+      const { data: userPls } = await supabase.from('playlists').select('id').eq('user_id', userId)
 
-      if (fallback) {
-        for (const v of fallback as Omit<VideoRow, 'liked_at'>[]) {
-          if (seen.has(v.id)) continue
-          seen.add(v.id)
-          all.push({ ...v, liked_at: null })
+      const plIds = ((userPls ?? []) as { id: string }[]).map((p) => p.id)
+      if (plIds.length > 0) {
+        const { data: pvData } = await supabase
+          .from('playlist_videos')
+          .select(
+            'videos!inner(id, youtube_id, title, ai_title, artist, duration_seconds, thumbnail_path, audio_path, status, created_at)',
+          )
+          .in('playlist_id', plIds)
+
+        if (pvData) {
+          for (const r of pvData) {
+            const v = r.videos as unknown as Omit<VideoRow, 'liked_at'> | null
+            if (!v || seen.has(v.id)) continue
+            seen.add(v.id)
+            all.push({ ...v, liked_at: null })
+          }
         }
       }
-    }
 
-    // Sort by created_at descending (latest first).
-    all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      // Fallback if nothing worked — query videos directly by added_by.
+      if (all.length === 0) {
+        const { data: fallback } = await supabase
+          .from('videos')
+          .select(
+            'id, youtube_id, title, ai_title, artist, duration_seconds, thumbnail_path, audio_path, status, created_at',
+          )
+          .eq('added_by', userId)
+          .order('created_at', { ascending: false })
 
-    setTracks(all)
-    writeCache(userId, all)
-    setIsLoading(false)
-  }, [userId])
+        if (fallback) {
+          for (const v of fallback as Omit<VideoRow, 'liked_at'>[]) {
+            if (seen.has(v.id)) continue
+            seen.add(v.id)
+            all.push({ ...v, liked_at: null })
+          }
+        }
+      }
+
+      // Sort by created_at descending (latest first).
+      all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+      setTracks(all)
+      writeCache(userId, all)
+      setIsLoading(false)
+    },
+    [userId],
+  )
 
   // Show cached data on mount, then fetch fresh
   useEffect(() => {
@@ -130,7 +133,7 @@ export function useLibrary() {
       const cached = readCache(userId)
       if (cached.length > 0) setTracks(cached)
     }
-    void load()
+    void load(false)
   }, [load, userId])
 
   // Keep status/metadata in sync as the worker processes tracks.
@@ -161,7 +164,7 @@ export function useLibrary() {
           // Debounce reloads — Realtime can fire multiple times for one logical change.
           if (reloadTimer.current) clearTimeout(reloadTimer.current)
           reloadTimer.current = setTimeout(() => {
-            void load()
+            void load(true)
           }, 400)
         },
       )
@@ -195,9 +198,10 @@ export function useLibrary() {
       setTracks((prev) => prev.map((t) => (t.id === videoId ? { ...t, liked_at } : t)))
       await supabase
         .from('user_videos')
-        .update({ liked_at })
-        .eq('user_id', userId)
-        .eq('video_id', videoId)
+        .upsert(
+          { user_id: userId, video_id: videoId, liked_at },
+          { onConflict: 'user_id,video_id' },
+        )
     },
     [userId, tracks],
   )

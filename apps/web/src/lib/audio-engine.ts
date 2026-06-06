@@ -47,6 +47,7 @@ class AudioEngine {
 
     audio.addEventListener('timeupdate', () => {
       this.syncProgress()
+      this.checkAbRepeat()
     })
     audio.addEventListener('ended', () => {
       this.onEnded()
@@ -153,6 +154,18 @@ class AudioEngine {
       if (next.status !== 'ready') {
         void preWarmWorker(next.youtubeId)
       }
+    }
+  }
+
+  private checkAbRepeat(): void {
+    const audio = this.audio
+    if (!audio) return
+    const { abRepeat, markerA, markerB } = usePlayerStore.getState()
+    if (!abRepeat || markerA === null || markerB === null || markerA >= markerB) return
+    const dur = this.effectiveDuration()
+    if (dur <= 0) return
+    if (audio.currentTime / dur >= markerB) {
+      audio.currentTime = markerA * dur
     }
   }
 

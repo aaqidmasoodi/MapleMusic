@@ -34,18 +34,18 @@ export function usePlaylists() {
 
     let pls = data as Playlist[]
 
-    // Auto-create "Favorites" for new users (runs once per session)
-    if (pls.length === 0 && !bootstrapped.current) {
+    // Ensure a Favorites playlist always exists.
+    const hasFavorites = pls.some((p) => p.name === 'Favorites')
+    if (!hasFavorites && !bootstrapped.current) {
       bootstrapped.current = true
       const { data: fav } = (await supabase
         .from('playlists')
         .insert({ user_id: userId, name: 'Favorites' })
         .select()
         .single()) as { data: Playlist | null }
-      if (fav) pls = [fav]
-    } else {
-      bootstrapped.current = true
+      if (fav) pls = [fav, ...pls]
     }
+    bootstrapped.current = true
 
     setPlaylists(pls)
     setIsLoading(false)

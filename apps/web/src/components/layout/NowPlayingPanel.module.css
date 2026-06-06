@@ -138,6 +138,22 @@
   flex-shrink: 0;
 }
 
+.progressZoomRow {
+  display: flex;
+  justify-content: flex-end;
+  height: 0;
+  position: relative;
+  top: -4px;
+}
+
+.progressBarContainer {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  display: flex;
+  align-items: center;
+}
+
 .progressRange {
   -webkit-appearance: none;
   appearance: none;
@@ -233,6 +249,12 @@
   height: 3px;
   background: var(--color-accent);
   border-radius: var(--radius-full);
+}
+
+.abBtn {
+  width: 38px;
+  height: 38px;
+  font-size: 10px;
 }
 
 .playBtn {
